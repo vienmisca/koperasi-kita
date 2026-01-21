@@ -1,0 +1,162 @@
+/* Custom scrollbar untuk stock management */
+.stock-management::-webkit-scrollbar {
+    width: 8px;
+}
+.stock-management::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.stock-management::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+.stock-management::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Animasi transisi */
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0;
+}
+
+/* Status warna stok */
+.status-stok-kosong {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+.status-stok-hampir-habis {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+.status-stok-aman {
+    background-color: #d1fae5;
+    color: #059669;
+}
+
+/* Progress bar stok */
+.progress-bar-container {
+    width: 96px;
+}
+.progress-bar {
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+.progress-bar-danger {
+    background-color: #ef4444;
+}
+.progress-bar-warning {
+    background-color: #f59e0b;
+}
+.progress-bar-success {
+    background-color: #10b981;
+}
+
+/* Modal styles */
+.modal-overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+}
+
+.modal-content {
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.modal-body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Badge kategori */
+.badge-kategori {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Grid stats */
+.stat-card {
+    background-color: white;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+    padding: 1.25rem;
+}
+
+.stat-icon {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+}
+
+/* Form input styles */
+.input-with-icon {
+    position: relative;
+}
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+/* Button groups */
+.btn-group-number {
+    display: flex;
+    align-items: center;
+}
+.btn-number-minus, .btn-number-plus {
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid #d1d5db;
+    background-color: #f9fafb;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-number-minus {
+    border-radius: 0.5rem 0 0 0.5rem;
+}
+.btn-number-plus {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+.input-number {
+    flex: 1;
+    height: 3rem;
+    border-top: 1px solid #d1d5db;
+    border-bottom: 1px solid #d1d5db;
+    text-align: center;
+    font-size: 1.125rem;
+    font-weight: bold;
+}
+
+/* Table styles */
+.table-header {
+    background-color: #f9fafb;
+}
+.table-cell {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+.table-row:hover {
+    background-color: #f9fafb;
+}
