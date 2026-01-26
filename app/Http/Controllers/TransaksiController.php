@@ -23,7 +23,7 @@ class TransaksiController extends Controller
         
         $pelanggan = Pelanggan::orderBy('nama_pelanggan')->get();
         
-        return view('transaksi', compact('barang', 'pelanggan'));
+        return view('kasir.transaksi', compact('barang', 'pelanggan'));
     }
 
     // Proses transaksi
@@ -112,12 +112,26 @@ class TransaksiController extends Controller
             
             DB::commit();
             
+            // Load relationship for receipt
+            $penjualan->load('details.barang', 'user');
+
             return response()->json([
                 'success' => true,
                 'message' => 'Transaksi berhasil!',
                 'no_penjualan' => $penjualan->no_penjualan,
+                'tanggal' => $penjualan->tanggal->format('d-m-Y H:i'),
+                'kasir' => $penjualan->user->name,
                 'total' => $total,
-                'kembalian' => $kembalian
+                'bayar' => $bayar,
+                'kembalian' => $kembalian,
+                'items' => $penjualan->details->map(function($detail) {
+                    return [
+                        'nama_barang' => $detail->barang->nama_barang,
+                        'qty' => $detail->jumlah,
+                        'harga' => $detail->harga,
+                        'subtotal' => $detail->subtotal
+                    ];
+                })
             ]);
             
         } catch (\Exception $e) {

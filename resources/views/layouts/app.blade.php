@@ -118,7 +118,7 @@
         <!-- MAIN CONTENT -->
         <div class="flex-1 flex flex-col min-h-screen transition-all duration-300 md:pl-64">
             <!-- TOPBAR -->
-            <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/80">
+            <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/80">
                 <!-- Search Bar (Hidden on mobile) -->
                 <div class="flex-1 max-w-xl hidden md:block">
                     <div class="relative group">

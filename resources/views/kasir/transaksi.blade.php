@@ -1,172 +1,200 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="h-[calc(100vh-6rem)] flex flex-col md:flex-row gap-4" x-data="posSystem()">
+<div class="h-[calc(100vh-5rem)] -m-4 md:-m-6 flex flex-col md:flex-row overflow-hidden bg-gray-100 font-sans" x-data="posSystem()">
     
-    <!-- Left: Product List -->
-    <div class="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full">
-        <!-- Search Bar -->
-        <div class="p-4 border-b bg-white z-10">
-            <div class="relative">
+    <!-- LEFT SECTION: PRODUCTS -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Header & Search -->
+        <div class="px-6 py-5 bg-white/80 backdrop-blur-sm border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center z-10">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 tracking-tight">Katalog Produk</h1>
+                <p class="text-sm text-gray-500">Pilih produk atau scan barcode</p>
+            </div>
+            
+            <div class="relative w-full sm:w-96 group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <!-- Search Input with Barcode Scanner Support -->
                 <input type="text" 
                        x-model="search"
-                       class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" 
-                       placeholder="Cari produk (nama/kode)..."
+                       x-ref="searchInput"
+                       @keydown.enter.prevent="handleScan()"
+                       class="block w-full pl-11 pr-4 py-3 bg-gray-50 border-0 ring-1 ring-gray-200 rounded-2xl leading-5 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm"
+                       placeholder="Cari nama / kode / scan..." 
                        autofocus>
-                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    <kbd class="hidden sm:inline-block px-2 py-0.5 bg-white border border-gray-200 rounded-md text-xs text-gray-400 font-medium font-mono">/</kbd>
                 </div>
             </div>
         </div>
-        
+
         <!-- Product Grid -->
-        <div class="flex-1 overflow-y-auto p-4 bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <template x-for="product in filteredProducts" :key="product.id_barang">
-                    <button @click="addToCart(product)" 
-                            class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-300 transition-all text-left flex flex-col h-full group relative overflow-hidden">
-                        
-                        <div class="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center text-gray-400 group-hover:scale-105 transition-transform overflow-hidden relative">
-                            <!-- Placeholder Image / Icon -->
-                             <span x-show="!product.gambar">
-                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                             </span>
-                             <img x-show="product.gambar" :src="'/storage/' + product.gambar" class="w-full h-full object-cover">
-                             
-                             <!-- Stock Badge -->
-                             <div class="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm font-mono">
-                                Stok: <span x-text="product.stok"></span>
-                             </div>
-                        </div>
-                        
-                        <div class="flex-1">
-                            <h3 class="font-bold text-gray-800 text-sm leading-tight mb-1 line-clamp-2" x-text="product.nama_barang"></h3>
-                            <p class="text-xs text-gray-500 mb-2 font-mono" x-text="product.kode_barang"></p>
-                        </div>
-                        
-                        <div class="mt-auto font-bold text-blue-600">
-                            Rp <span x-text="formatNumber(product.harga_jual)"></span>
-                        </div>
-                    </button>
-                </template>
-                
-                <!-- No Results -->
-                <div x-show="filteredProducts.length === 0" class="col-span-full py-12 text-center text-gray-500 flex flex-col items-center">
-                    <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    <p>Produk tidak ditemukan.</p>
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth custom-scrollbar">
+            
+            <div x-show="filteredProducts.length === 0" class="h-full flex flex-col items-center justify-center text-center opacity-0 animate-fade-in-up" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-6">
+                    <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Tidak ditemukan</h3>
+                <p class="text-gray-500 max-w-xs mx-auto">Produk dengan kata kunci tersebut tidak tersedia di katalog.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pb-20">
+                <template x-for="product in filteredProducts" :key="product.id_barang">
+                    <div @click="addToCart(product)" 
+                         class="group bg-white rounded-3xl p-3 cursor-pointer shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1),0_10px_10px_-5px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-all duration-300 border border-transparent hover:border-indigo-100 relative overflow-hidden h-full flex flex-col">
+                        
+                        <!-- Image Container -->
+                        <div class="aspect-[4/3] rounded-2xl bg-gray-100 overflow-hidden relative mb-3">
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-300 bg-gray-50">
+                                <svg class="w-8 h-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <img x-show="product.gambar" 
+                                 :src="'/storage/' + product.gambar" 
+                                 loading="lazy"
+                                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            
+                            <!-- Badge Stock -->
+                            <div class="absolute top-2 right-2">
+                                <span class="px-2 py-1 text-[10px] font-bold text-white bg-black/60 backdrop-blur-md rounded-lg"
+                                      :class="{'bg-red-500/80': product.stok <= 5}">
+                                    <span x-text="product.stok"></span> Stok
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Info -->
+                        <div class="flex-1 flex flex-col">
+                            <h3 class="font-bold text-gray-800 text-sm leading-tight mb-1 group-hover:text-indigo-600 transition-colors line-clamp-2" x-text="product.nama_barang"></h3>
+                            <p class="text-[10px] text-gray-400 font-mono mb-3" x-text="product.kode_barang"></p>
+                            
+                            <div class="mt-auto flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-gray-400">Harga</span>
+                                    <span class="font-bold text-gray-900 text-base">
+                                        Rp <span x-text="formatNumber(product.harga_jual)"></span>
+                                    </span>
+                                </div>
+                                <button class="w-8 h-8 rounded-full bg-gray-50 text-gray-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
             </div>
         </div>
     </div>
-    
-    <!-- Right: Cart (Receipt Style) -->
-    <div class="w-full md:w-96 flex flex-col h-full">
-        <div class="bg-white rounded-xl shadow-lg border border-gray-200 h-full flex flex-col overflow-hidden relative" style="filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));">
-            
-            <!-- Receipt Top Decoration -->
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
 
-            <!-- Receipt Header -->
-            <div class="mt-2 p-5 border-b-2 border-dashed border-gray-200 text-center bg-gray-50">
-                <h2 class="font-bold text-gray-800 text-lg uppercase tracking-wider">Koperasi Kita</h2>
-                <p class="text-xs text-gray-500 mt-1">Jl. Pendidikan No. 123</p>
-                 <div class="mt-3 flex justify-between text-xs text-gray-400 font-mono">
-                     <span>{{ date('d/m/Y') }}</span>
-                     <span>#TRX-{{ rand(1000,9999) }}</span>
-                 </div>
+    <!-- RIGHT SECTION: CART (Dark Theme) -->
+    <div class="w-full md:w-[420px] bg-[#1a1c23] text-white flex flex-col h-full shadow-2xl z-20 transition-all duration-300">
+        
+        <!-- Cart Header -->
+        <div class="p-6 bg-[#1a1c23] border-b border-gray-700/50 flex items-center justify-between sticky top-0 z-10">
+            <div>
+                <h2 class="text-xl font-bold tracking-tight">Order Saat Ini</h2>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <p class="text-xs text-gray-400 font-mono">TRX-{{ date('ymd') }}-{{ rand(100,999) }}</p>
+                </div>
             </div>
-            
-            <!-- Cart Items (Receipt Body) -->
-            <div class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fffdfb]" style="background-image: radial-gradient(#f0f0f0 1px, transparent 1px); background-size: 20px 20px;">
-                 <template x-for="(item, index) in cart" :key="item.id_barang">
-                    <div class="flex gap-2 p-2 relative group hover:bg-gray-50 rounded transition-colors">
-                        <!-- Remove Btn (Absolute) -->
-                         <button @click="updateQty(index, -item.qty)" class="absolute -left-2 top-1 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                         </button>
+            <button @click="clearCart()" 
+                    x-show="cart.length > 0"
+                    class="p-2 rounded-xl bg-gray-800 text-gray-400 hover:text-red-400 hover:bg-gray-700 transition-colors"
+                    title="Kosongkan Keranjang">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+        </div>
 
-                        <div class="flex-1 font-mono text-sm text-gray-700">
-                             <div class="flex justify-between font-bold">
-                                 <span x-text="item.nama_barang" class="truncate w-32"></span>
-                                 <span>Rp <span x-text="formatNumber(item.harga_jual * item.qty)"></span></span>
-                             </div>
-                             <div class="flex justify-between text-xs text-gray-500 mt-1">
-                                 <span class="flex items-center gap-2">
-                                     <button @click="updateQty(index, -1)" class="w-5 h-5 bg-gray-200 rounded text-gray-600 hover:bg-gray-300">-</button>
-                                     <span class="w-4 text-center" x-text="item.qty"></span>
-                                     <button @click="updateQty(index, 1)" class="w-5 h-5 bg-gray-200 rounded text-gray-600 hover:bg-gray-300">+</button>
-                                      x Rp <span x-text="formatNumber(item.harga_jual)"></span>
-                                 </span>
-                             </div>
+        <!-- Cart Items List -->
+        <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar relative">
+            
+            <div x-show="cart.length === 0" class="absolute inset-0 flex flex-col items-center justify-center opacity-30 pointer-events-none text-center p-6">
+                <svg class="w-20 h-20 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                <h3 class="text-lg font-medium text-gray-400">Keranjang Kosong</h3>
+                <p class="text-sm text-gray-600 mt-1 max-w-[200px]">Scan produk atau pilih dari katalog untuk memulai transaksi.</p>
+            </div>
+
+            <template x-for="(item, index) in cart" :key="item.id_barang">
+                <div class="bg-[#242731] p-4 rounded-2xl border border-gray-700/50 group hover:border-indigo-500/30 transition-all duration-300">
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1 pr-3">
+                            <h4 class="font-medium text-sm text-gray-100 leading-snug line-clamp-2" x-text="item.nama_barang"></h4>
+                            <p class="text-[10px] text-gray-500 font-mono mt-1" x-text="item.kode_barang"></p>
+                        </div>
+                        <div class="text-right">
+                             <div class="font-bold text-white text-sm">Rp <span x-text="formatNumber(item.harga_jual * item.qty)"></span></div>
+                             <div class="text-[10px] text-gray-500">@ <span x-text="formatNumber(item.harga_jual)"></span></div>
                         </div>
                     </div>
-                 </template>
-                 
-                 <!-- Empty Cart State -->
-                 <div x-show="cart.length === 0" class="h-full flex flex-col items-center justify-center text-gray-300">
-                     <svg class="w-16 h-16 mb-2 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                     <p class="text-sm font-mono opacity-60">Belum ada item</p>
-                 </div>
-            </div>
-            
-            <!-- Receipt Footer (Totals & Payment) -->
-            <div class="bg-gray-50 p-5 border-t-2 border-dashed border-gray-200 relative text-sm">
-                <!-- Zigzag Decoration Top -->
-                <div class="absolute -top-1 left-0 w-full h-2 bg-transparent" 
-                     style="background: linear-gradient(135deg, transparent 50%, #f9fafb 50%), linear-gradient(45deg, #f9fafb 50%, transparent 50%); background-size: 10px 10px;"></div>
+                    
+                    <div class="flex items-center justify-between bg-[#1a1c23] rounded-xl p-1.5 w-max">
+                         <button @click="updateQty(index, -1)" class="w-7 h-7 flex items-center justify-center rounded-lg bg-[#242731] text-gray-400 hover:text-white hover:bg-gray-700 transition-colors">
+                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                         </button>
+                         <input readonly :value="item.qty" class="w-10 text-center bg-transparent border-0 text-white font-bold text-sm p-0 focus:ring-0">
+                         <button @click="updateQty(index, 1)" class="w-7 h-7 flex items-center justify-center rounded-lg bg-[#242731] text-gray-400 hover:text-indigo-400 hover:bg-gray-700 transition-colors">
+                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                         </button>
+                    </div>
+                </div>
+            </template>
+        </div>
 
-                <!-- Totals -->
-                <div class="space-y-2 font-mono text-gray-600 mb-4">
-                    <div class="flex justify-between">
-                        <span>Subtotal</span>
-                        <span>Rp <span x-text="formatNumber(total)"></span></span>
-                    </div>
+        <!-- Checkout Area -->
+        <div class="bg-[#1a1c23] border-t border-gray-800 p-6 z-20">
+            <!-- Payment Details -->
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between text-gray-400 text-sm">
+                    <span>Subtotal</span>
+                    <span>Rp <span x-text="formatNumber(total)"></span></span>
                 </div>
-
-                <!-- Payment Inputs -->
-                <div class="space-y-3 mb-4 pt-3 border-t border-gray-200">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Bayar (Rp)</label>
-                        <input type="number" 
-                               x-model.number="payAmount" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-right text-gray-700 font-bold"
-                               placeholder="0">
-                    </div>
-                    
-                    <div class="flex justify-between items-center bg-white p-3 rounded-lg border border-gray-200">
-                        <span class="font-bold text-gray-600 uppercase text-xs">Kembali</span>
-                        <span class="font-bold font-mono text-lg" 
-                              :class="change >= 0 ? 'text-green-600' : 'text-red-500'">
-                            Rp <span x-text="formatNumber(change)"></span>
-                        </span>
-                    </div>
-                </div>
-                
-                <!-- Grand Total -->
-                <div class="flex justify-between items-center pt-3 border-t border-gray-300 mb-4">
-                    <span class="font-bold text-gray-800 text-lg uppercase">Total</span>
-                    <span class="font-bold text-indigo-700 text-xl font-mono">Rp <span x-text="formatNumber(total)"></span></span>
-                </div>
-                
-                <!-- Pay Button -->
-                <button @click="processCheckout()" 
-                        :disabled="cart.length === 0 || payAmount < total || isLoading"
-                        class="w-full py-3.5 bg-gray-800 text-white rounded-xl font-bold text-lg shadow-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95 flex justify-center items-center gap-2 group relative overflow-hidden">
-                    
-                    <span x-show="!isLoading" class="flex items-center gap-2">
-                        <span>Bayar Sekarang</span>
-                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                <!-- Discount row can go here -->
+                <div class="w-full h-px bg-gray-800 my-2"></div>
+                <div class="flex justify-between items-end">
+                    <span class="text-base font-semibold text-white">Total Tagihan</span>
+                    <span class="text-3xl font-bold text-indigo-400 tracking-tight">
+                        <span class="text-sm font-normal text-gray-500 mr-1">Rp</span><span x-text="formatNumber(total)"></span>
                     </span>
-                    
-                    <span x-show="isLoading" class="flex items-center gap-2">
-                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Memproses...
-                    </span>
-                </button>
+                </div>
             </div>
+
+            <!-- Pay Input -->
+            <div class="mb-4 relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span class="text-indigo-400 font-bold">Rp</span>
+                </div>
+                <input type="number" 
+                       x-model.number="payAmount" 
+                       class="block w-full pl-12 pr-4 py-4 bg-[#242731] border border-gray-700/50 rounded-2xl text-white font-bold text-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-600 shadow-inner"
+                       placeholder="Masukkan Jumlah Bayar">
+            </div>
+
+            <!-- Change & Button -->
+             <div class="flex items-center justify-between mb-4 px-1">
+                 <span class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Kembalian</span>
+                 <span class="text-xl font-bold font-mono" :class="change >= 0 ? 'text-green-400' : 'text-red-400'">
+                     Rp <span x-text="formatNumber(Math.abs(change))"></span>
+                 </span>
+             </div>
+
+            <button @click="processCheckout()"
+                    :disabled="cart.length === 0 || payAmount < total || isLoading"
+                    class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                <span x-show="!isLoading" class="flex items-center gap-2">
+                    Proses Transaksi <svg class="w-5 h-5 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </span>
+                <span x-show="isLoading" class="flex items-center gap-2">
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Memproses...
+                </span>
+            </button>
         </div>
     </div>
 </div>
@@ -209,31 +237,69 @@
                 }));
             },
             
+            handleScan() {
+                if (!this.search) return;
+                
+                const exactMatch = this.products.find(p => 
+                    p.kode_barang.toLowerCase() === this.search.toLowerCase()
+                );
+                
+                if (exactMatch) {
+                    this.addToCart(exactMatch);
+                    this.search = '';
+                    return;
+                }
+                
+                if (this.filteredProducts.length === 1) {
+                    this.addToCart(this.filteredProducts[0]);
+                    this.search = '';
+                    return;
+                }
+
+                this.playSound('error');
+                this.notify('error', 'Produk tidak ditemukan!');
+            },
+
+            playSound(type = 'success') {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                
+                const ctx = new AudioContext();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.type = type === 'error' ? 'sawtooth' : 'sine';
+                osc.frequency.setValueAtTime(type === 'error' ? 200 : 800, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.15);
+                osc.stop(ctx.currentTime + 0.15);
+            },
+            
             addToCart(product) {
                 const existingItem = this.cart.find(item => item.id_barang === product.id_barang);
-                
                 if (existingItem) {
                     if (existingItem.qty >= product.stok) {
+                        this.playSound('error');
                         this.notify('error', 'Stok tidak mencukupi!');
                         return;
                     }
                     existingItem.qty++;
                 } else {
                     if (product.stok <= 0) {
+                         this.playSound('error');
                          this.notify('error', 'Stok Habis!');
                          return;
                     }
-                    this.cart.push({
-                        ...product,
-                        qty: 1
-                    });
+                    this.cart.push({ ...product, qty: 1 });
                 }
+                this.playSound('success');
             },
             
             updateQty(index, change) {
                 const item = this.cart[index];
                 const product = this.products.find(p => p.id_barang === item.id_barang);
-                
                 const newQty = item.qty + change;
                 
                 if (newQty <= 0) {
@@ -242,10 +308,10 @@
                 }
                 
                 if (newQty > product.stok) {
+                    this.playSound('error');
                     this.notify('warning', 'Stok maksimal tercapai!');
                     return;
                 }
-                
                 item.qty = newQty;
             },
             
@@ -259,7 +325,6 @@
             processCheckout() {
                 if (this.cart.length === 0) return;
                 
-                // Extra client-side validation logic if needed
                 if (this.payAmount < this.total) {
                     this.notify('error', 'Pembayaran kurang!');
                     return;
@@ -271,6 +336,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
@@ -282,28 +348,22 @@
                         bayar: this.payAmount,
                         customer_name: this.customerName,
                         payment_method: this.paymentMethod,
-                        // Send current user ID if handled by backend Auth
                     })
                 })
                 .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => Promise.reject(err));
-                    }
+                    if (!response.ok) return response.json().then(err => Promise.reject(err));
                     return response.json();
                 })
                 .then(data => {
                     if (data.success) {
                         this.notify('success', `Transaksi Berhasil! Kembalian: Rp ${this.formatNumber(data.kembalian)}`);
+                        this.printReceipt(data);
                         
-                        // Update local stock to reflect purchase
                         this.cart.forEach(cartItem => {
                             const product = this.products.find(p => p.id_barang === cartItem.id_barang);
-                            if (product) {
-                                product.stok -= cartItem.qty;
-                            }
+                            if (product) product.stok -= cartItem.qty;
                         });
 
-                        // Reset
                         this.cart = [];
                         this.payAmount = 0;
                     } else {
@@ -317,6 +377,64 @@
                 .finally(() => {
                     this.isLoading = false;
                 });
+            },
+
+            printReceipt(data) {
+                const receiptHtml = `
+                    <html>
+                    <head>
+                        <title>Struk Belanja</title>
+                        <style>
+                            @page { margin: 0; size: 58mm auto; }
+                            body { font-family: 'Courier New', monospace; font-size: 10px; margin: 0; padding: 10px; width: 58mm; box-sizing: border-box; }
+                            .center { text-align: center; }
+                            .right { text-align: right; }
+                            .bold { font-weight: bold; }
+                            .divider { border-top: 1px dashed #000; margin: 5px 0; }
+                            table { width: 100%; border-collapse: collapse; }
+                            td { vertical-align: top; }
+                            .qt { width: 15%; } .pr { width: 55%; text-align: right; } .sb { width: 30%; text-align: right; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="center bold" style="font-size: 14px;">KOPERASI</div>
+                        <div class="center">Jl. Pendidikan No. 123</div>
+                        <div class="divider"></div>
+                        <div>${data.no_penjualan}</div>
+                        <div>${data.tanggal}</div>
+                        <div>Kasir: ${data.kasir}</div>
+                        <div class="divider"></div>
+                        <table>
+                            ${data.items.map(item => `
+                                <tr><td colspan="3" class="bold">${item.nama_barang}</td></tr>
+                                <tr>
+                                    <td>${item.qty}x</td>
+                                    <td class="right">${new Intl.NumberFormat('id-ID').format(item.harga)}</td>
+                                    <td class="right">${new Intl.NumberFormat('id-ID').format(item.subtotal)}</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                        <div class="divider"></div>
+                        <table>
+                            <tr><td class="bold">Total</td><td class="right bold">${new Intl.NumberFormat('id-ID').format(data.total)}</td></tr>
+                            <tr><td>Bayar</td><td class="right">${new Intl.NumberFormat('id-ID').format(data.bayar)}</td></tr>
+                            <tr><td>Kembali</td><td class="right">${new Intl.NumberFormat('id-ID').format(data.kembalian)}</td></tr>
+                        </table>
+                        <div class="divider"></div>
+                        <div class="center">Terima Kasih</div>
+                    </body>
+                    </html>
+                `;
+                let iframe = document.getElementById('receipt-frame');
+                if (!iframe) {
+                    iframe = document.createElement('iframe');
+                    iframe.id = 'receipt-frame';
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                }
+                const doc = iframe.contentWindow.document;
+                doc.open(); doc.write(receiptHtml); doc.close();
+                iframe.onload = () => { iframe.contentWindow.focus(); iframe.contentWindow.print(); };
             }
         }
     }
