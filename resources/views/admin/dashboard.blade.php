@@ -25,7 +25,7 @@
             </div>
             <div>
                 <p class="text-sm text-gray-500 font-medium">Total Stok Barang</p>
-                <h3 class="text-2xl font-bold text-gray-800">1,240</h3>
+                <h3 class="text-2xl font-bold text-gray-800">{{ number_format($totalStok) }}</h3>
             </div>
         </div>
         
@@ -36,7 +36,7 @@
             </div>
             <div>
                 <p class="text-sm text-gray-500 font-medium">Pendapatan Hari Ini</p>
-                <h3 class="text-2xl font-bold text-gray-800">Rp 4.500.000</h3>
+                <h3 class="text-2xl font-bold text-gray-800">Rp {{ number_format($pendapatanHariIni, 0, ',', '.') }}</h3>
             </div>
         </div>
 
@@ -47,7 +47,7 @@
             </div>
             <div>
                 <p class="text-sm text-gray-500 font-medium">Transaksi Hari Ini</p>
-                <h3 class="text-2xl font-bold text-gray-800">45</h3>
+                <h3 class="text-2xl font-bold text-gray-800">{{ number_format($transaksiHariIni) }}</h3>
             </div>
         </div>
 
@@ -58,7 +58,7 @@
             </div>
             <div>
                 <p class="text-sm text-gray-500 font-medium">Total User Aktif</p>
-                <h3 class="text-2xl font-bold text-gray-800">8</h3>
+                <h3 class="text-2xl font-bold text-gray-800">{{ $totalUser }}</h3>
             </div>
         </div>
     </div>
@@ -69,8 +69,8 @@
         <!-- Left: Recent Transactions -->
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold text-lg text-gray-800">Aktivitas Terbaru</h3>
-                <button class="text-sm text-indigo-600 font-medium hover:text-indigo-700">Lihat Semua</button>
+                <h3 class="font-bold text-lg text-gray-800">Aktivitas Penjualan Terbaru</h3>
+                <a href="{{ route('kasir.laporan') }}" class="text-sm text-indigo-600 font-medium hover:text-indigo-700">Lihat Semua</a>
             </div>
             
             <div class="overflow-x-auto">
@@ -78,31 +78,32 @@
                     <thead>
                         <tr class="text-xs text-gray-400 uppercase border-b border-gray-50">
                             <th class="pb-3 pl-2 font-medium">User</th>
-                            <th class="pb-3 font-medium">Aktivitas</th>
+                            <th class="pb-3 font-medium">No. Penjualan</th>
+                            <th class="pb-3 font-medium">Total</th>
                             <th class="pb-3 font-medium">Waktu</th>
                             <th class="pb-3 font-medium text-right">Status</th>
                         </tr>
                     </thead>
                     <tbody class="text-sm">
-                        <!-- Dummy Data -->
+                        @forelse($recentActivities as $activity)
                          <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                            <td class="py-4 pl-2 font-medium text-gray-800">Kasir 1</td>
-                            <td class="py-4 text-gray-500">Menambahkan Transaksi #TRX-982</td>
-                            <td class="py-4 text-gray-400 text-xs">2 menit lalu</td>
-                            <td class="py-4 text-right"><span class="px-2.5 py-1 bg-green-50 text-green-600 rounded-full text-xs font-medium">Sukses</span></td>
+                            <td class="py-4 pl-2 font-medium text-gray-800">{{ $activity->user->name ?? 'Unknown' }}</td>
+                            <td class="py-4 text-gray-500 font-mono">{{ $activity->no_penjualan }}</td>
+                            <td class="py-4 text-gray-800 font-bold">Rp {{ number_format($activity->total, 0, ',', '.') }}</td>
+                            <td class="py-4 text-gray-400 text-xs">{{ $activity->created_at->diffForHumans() }}</td>
+                            <td class="py-4 text-right">
+                                <span class="px-2.5 py-1 
+                                    {{ $activity->status == 'selesai' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600' }} 
+                                    rounded-full text-xs font-medium uppercase">
+                                    {{ $activity->status }}
+                                </span>
+                            </td>
                         </tr>
-                        <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                            <td class="py-4 pl-2 font-medium text-gray-800">Admin</td>
-                            <td class="py-4 text-gray-500">Update Stok Barang: Kopi Kapal Api</td>
-                            <td class="py-4 text-gray-400 text-xs">15 menit lalu</td>
-                            <td class="py-4 text-right"><span class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">Updated</span></td>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-gray-400">Belum ada aktivitas.</td>
                         </tr>
-                        <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors">
-                            <td class="py-4 pl-2 font-medium text-gray-800">Kasir 2</td>
-                            <td class="py-4 text-gray-500">Login ke sistem</td>
-                            <td class="py-4 text-gray-400 text-xs">1 jam lalu</td>
-                            <td class="py-4 text-right"><span class="px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Login</span></td>
-                        </tr>
+                        @endforelse
                      </tbody>
                 </table>
             </div>
@@ -112,25 +113,25 @@
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
              <div class="flex justify-between items-center mb-6">
                 <h3 class="font-bold text-lg text-gray-800">Peringatan Stok</h3>
-                <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                @if($lowStockItems->count() > 0)
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                @endif
             </div>
             
             <div class="space-y-4">
+                @forelse($lowStockItems as $item)
                 <div class="flex items-center gap-3 p-3 bg-red-50 rounded-xl border border-red-100">
                     <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-red-500 shadow-sm font-bold">!</div>
                     <div>
-                        <h4 class="text-sm font-bold text-gray-800">Indomie Goreng</h4>
-                        <p class="text-xs text-red-500 font-medium">Sisa Stok: 5 pcs</p>
+                        <h4 class="text-sm font-bold text-gray-800">{{ $item->nama_barang }}</h4>
+                        <p class="text-xs text-red-500 font-medium">Sisa Stok: {{ $item->stok }} {{ $item->satuan ?? 'pcs' }}</p>
                     </div>
                 </div>
-
-                 <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-xl border border-yellow-100">
-                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-yellow-500 shadow-sm font-bold">!</div>
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-800">Gula Pasir 1kg</h4>
-                        <p class="text-xs text-yellow-600 font-medium">Sisa Stok: 12 pcs</p>
-                    </div>
+                @empty
+                <div class="text-center py-8 text-gray-400">
+                    <p class="text-sm">Stok aman.</p>
                 </div>
+                @endforelse
                 
                  <div class="text-center mt-4">
                      <a href="{{ route('stock.index') }}" class="text-sm text-indigo-600 hover:underline">Lihat semua stok &rarr;</a>

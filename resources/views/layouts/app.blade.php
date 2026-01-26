@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Koperasi' }}</title>
     
     <!-- Alpine.js for interactivity -->
@@ -36,6 +37,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
       @include('layouts.loading')
+    @include('components.toast')
     <div class="flex min-h-screen bg-gray-50">
         <!-- Mobile Sidebar Toggle -->
         <button @click="sidebarOpen = !sidebarOpen"

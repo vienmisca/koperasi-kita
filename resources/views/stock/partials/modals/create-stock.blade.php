@@ -22,7 +22,8 @@
         <div class="px-8 py-6 border-b flex justify-between items-center bg-gray-50">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <span>📥</span> Barang Masuk
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Barang Masuk
                 </h2>
                 <p class="text-gray-600 mt-1">Tambah stok baru atau input barang baru ke sistem</p>
             </div>
@@ -42,7 +43,6 @@
                     </label>
                     <input type="date" 
                            x-model="form.tanggal_masuk"
-                           :max="today"
                            class="w-full border-gray-300 border rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
                            required>
                 </div>
@@ -60,7 +60,7 @@
                                     : 'bg-white border-gray-200 hover:bg-gray-50'"
                                 class="p-4 border rounded-xl text-center transition-all duration-200 group">
                             <div class="flex flex-col items-center gap-2">
-                                <span class="text-3xl group-hover:scale-110 transition-transform">📦</span>
+                                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                                 <span class="font-bold text-gray-900">Barang Sudah Ada</span>
                                 <span class="text-sm text-gray-500">Tambah stok barang yang terdaftar</span>
                             </div>
@@ -73,7 +73,7 @@
                                     : 'bg-white border-gray-200 hover:bg-gray-50'"
                                 class="p-4 border rounded-xl text-center transition-all duration-200 group">
                             <div class="flex flex-col items-center gap-2">
-                                <span class="text-3xl group-hover:scale-110 transition-transform">🆕</span>
+                                <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 <span class="font-bold text-gray-900">Barang Baru</span>
                                 <span class="text-sm text-gray-500">Input barang baru ke sistem</span>
                             </div>
@@ -89,7 +89,8 @@
                         </div>
                         
                         <h3 class="text-lg font-bold text-blue-800 mb-4 relative z-10 flex items-center gap-2">
-                            🔍 Pilih Barang yang Sudah Ada
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            Pilih Barang yang Sudah Ada
                         </h3>
                         
                         <!-- Pencarian Barang -->
@@ -202,12 +203,13 @@
                 <!-- MODE: BARANG BARU -->
                 <div x-show="mode === 'new'" x-transition class="mb-8">
                     <div class="bg-green-50 border border-green-200 rounded-xl p-6 relative overflow-hidden">
-                         <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
                             <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 001-1l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
                         </div>
 
                         <h3 class="text-lg font-bold text-green-800 mb-6 relative z-10 flex items-center gap-2">
-                            🆕 Input Barang Baru
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Input Barang Baru
                         </h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
@@ -391,10 +393,16 @@
                                     : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-green-200'"
                             class="px-8 py-3 text-white rounded-xl font-bold text-lg flex items-center gap-3 shadow-lg transform active:scale-95 transition-all">
                         <template x-if="mode === 'existing'">
-                            <span class="flex items-center gap-2">💾 Simpan Stok Masuk</span>
+                            <span class="flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                                Simpan Stok Masuk
+                            </span>
                         </template>
                         <template x-if="mode === 'new'">
-                            <span class="flex items-center gap-2">🆕 Simpan Barang Baru</span>
+                            <span class="flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                Simpan Barang Baru
+                            </span>
                         </template>
                     </button>
                 </div>

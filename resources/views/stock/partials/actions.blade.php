@@ -2,7 +2,8 @@
     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
             <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-2">
-                <span>📦</span> Manajemen Stok Barang
+                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                Manajemen Stok Barang
             </h1>
             <p class="text-gray-600 mt-2">Kelola stok barang koperasi SMK dengan mudah</p>
         </div>

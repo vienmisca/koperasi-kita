@@ -14,6 +14,7 @@ class KasirSeeder extends Seeder
             'name' => 'Kasir Utama',
             'email' => 'kasir@toko.com',
             'password' => Hash::make('kasir123'),
+            'role' => 'kasir',
             'email_verified_at' => now(), // WAJIB biar lolos middleware verified
         ]);
     }

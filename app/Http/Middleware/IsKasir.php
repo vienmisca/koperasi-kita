@@ -11,10 +11,16 @@ class IsKasir
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->role === 'user') {
+        if (Auth::check() && Auth::user()->role === 'kasir') {
             return $next($request);
         }
 
-        return redirect('/admin'); // kalo admin nyasar ke kasir
+        // Only redirect to admin if specifically an admin
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect('/admin');
+        }
+
+        // Otherwise (unknown role) go to home to avoid loops
+        return redirect('/');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StockController;
@@ -21,9 +22,8 @@ Route::get('/dashboard', [App\Http\Controllers\KasirController::class, 'dashboar
     ->middleware(['auth', 'isKasir'])->name('dashboard');
 
 // Dashboard ADMIN
-Route::get('/admin', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'isAdmin'])->name('admin.dashboard');
+Route::get('/admin', [App\Http\Controllers\AdminController::class, 'dashboard'])
+    ->middleware(['auth', 'isAdmin'])->name('admin.dashboard');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/barang-list', function() {
@@ -42,6 +42,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/transaksi', [App\Http\Controllers\KasirController::class, 'transaksi'])
         ->middleware('isKasir')->name('transaksi');
 
+    Route::post('/transaksi/process', [App\Http\Controllers\TransaksiController::class, 'process'])
+        ->middleware('isKasir')->name('transaksi.process');
+
     // Group Routes Kasir
     Route::middleware('isKasir')->prefix('kasir')->name('kasir.')->group(function() {
         Route::get('/stock', [App\Http\Controllers\KasirController::class, 'stock'])->name('stock');
@@ -54,6 +57,9 @@ Route::middleware('auth')->group(function () {
     |---------------------------------------------------------------
     */
     Route::middleware('isAdmin')->group(function () {
+
+        // === USERS / PENGGUNA ===
+        Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
 
         // === KATEGORI ===
         Route::post('/kategori', [KategoriController::class, 'store'])

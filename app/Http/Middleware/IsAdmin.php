@@ -15,6 +15,12 @@ class IsAdmin
             return $next($request);
         }
 
-        return redirect('/dashboard');
+        // Only redirect to dashboard if specifically a kasir
+        if (Auth::check() && Auth::user()->role === 'kasir') {
+            return redirect('/dashboard');
+        }
+
+        // Otherwise (unknown role) go to home to avoid loops
+        return redirect('/');
     }
 }

@@ -1,6 +1,6 @@
 <script>
-    function stockSystem() {
-        return {
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('stockSystem', () => ({
             // Data state
             showForm: false,
             mode: 'existing',
@@ -22,7 +22,7 @@
             
             // Barang existing
             barangList: @json($barang),
-            filteredBarang: @json($barang),
+            filteredBarang: [],
             searchQuery: '',
             selectedBarang: null,
             existingItem: {
@@ -46,8 +46,7 @@
     
             imagePreview: null,
     
-            
-            // Table filtering
+            // Table filtering (initialized in init)
             tableSearch: '',
             tableCategory: '',
             
@@ -68,16 +67,16 @@
             
             // Methods
             init() {
-                // Initialize
                 // Initial filter to sync list
                 this.filteredBarang = this.barangList;
+                console.log('Stock System Initialized', this.barangList);
             },
     
             openEditModal(id) {
                 const barang = this.barangList.find(b => b.id_barang == id);
     
                 if (!barang) {
-                    alert('Data barang tidak ditemukan!');
+                    this.notify('error', 'Data barang tidak ditemukan!');
                     return;
                 }
     
@@ -140,6 +139,7 @@
                 if (this.newItem.gambar) {
                     formData.append('gambar', this.newItem.gambar);
                 }
+                
                 try {
                     const response = await fetch('{{ route("stock.store") }}', {
                         method: 'POST',
@@ -153,14 +153,15 @@
                     const result = await response.json();
                     
                     if (result.success) {
-                        alert('Berhasil! ' + result.message);
+                        this.notify('success', 'Berhasil: ' + result.message);
                         this.closeModal();
-                        location.reload(); // Refresh halaman
+                        setTimeout(() => location.reload(), 1500); 
                     } else {
-                        alert('Gagal: ' + result.message);
+                        this.notify('error', 'Gagal: ' + result.message);
                     }
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    console.error(error);
+                    this.notify('error', 'Error: ' + error.message);
                 }
             },
             
@@ -191,6 +192,13 @@
                 this.imagePreview = null;
             },
             
+            // Helper for Notifications
+            notify(type, message) {
+                window.dispatchEvent(new CustomEvent('notify', { 
+                    detail: { type, message } 
+                }));
+            },
+
             tambahStokBarang(id, nama) {
                 this.showForm = true;
                 this.mode = 'existing';
@@ -214,8 +222,8 @@
                     const name = row.getAttribute('data-name');
                     const cat = row.getAttribute('data-category');
                     
-                    const matchesSearch = !searchTerm || name.includes(searchTerm);
-                    const matchesCategory = !category || cat.includes(category);
+                    const matchesSearch = !searchTerm || (name && name.includes(searchTerm));
+                    const matchesCategory = !category || (cat && cat.includes(category));
                     
                     row.style.display = matchesSearch && matchesCategory ? '' : 'none';
                 });
@@ -224,7 +232,6 @@
             formatNumber(num) {
                 return new Intl.NumberFormat('id-ID').format(num);
             },
-    
     
             previewImage(event) {
                 const file = event.target.files[0];
@@ -254,14 +261,14 @@
                     const result = await response.json();
             
                     if (result.success) {
-                        alert('Barang berhasil diupdate!');
+                        this.notify('success', 'Barang berhasil diupdate!');
                         this.showEditModal = false;
-                        location.reload();
+                        setTimeout(() => location.reload(), 1500);
                     } else {
-                        alert('Gagal: ' + result.message);
+                        this.notify('error', 'Gagal update: ' + result.message);
                     }
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    this.notify('error', 'Error: ' + error.message);
                 }
             },
             
@@ -280,19 +287,19 @@
                     const result = await response.json();
             
                     if (result.success) {
-                        alert('Barang berhasil dihapus!');
-                        location.reload();
+                        this.notify('success', 'Barang berhasil dihapus!');
+                        setTimeout(() => location.reload(), 1500);
                     } else {
-                        alert('Gagal: ' + result.message);
+                        this.notify('error', 'Gagal hapus: ' + result.message);
                     }
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    this.notify('error', 'Error: ' + error.message);
                 }
             },
             
             async submitKategori() {
                 if (!this.kategoriBaru.kode_kategori || !this.kategoriBaru.nama_kategori) {
-                    alert('Kode dan Nama Kategori wajib diisi!');
+                    this.notify('warning', 'Kode dan Nama Kategori wajib diisi!');
                     return;
                 }
             
@@ -310,7 +317,7 @@
                     const result = await response.json();
             
                     if (result.success) {
-                        alert('Kategori berhasil ditambahkan!');
+                        this.notify('success', 'Kategori berhasil ditambahkan!');
                         this.showKategoriModal = false;
             
                         this.kategoriBaru = {
@@ -319,14 +326,14 @@
                             deskripsi: ''
                         };
             
-                        location.reload();
+                        setTimeout(() => location.reload(), 1500);
                     } else {
-                        alert('Gagal: ' + result.message);
+                        this.notify('error', 'Gagal tambah kategori: ' + result.message);
                     }
                 } catch (error) {
-                    alert('Error: ' + error.message);
+                    this.notify('error', 'Error: ' + error.message);
                 }
             }
-        }
-    }
-    </script>
+        }));
+    });
+</script>
