@@ -350,35 +350,54 @@ class StockController extends Controller
     /**
      * Update data barang
      */
+    /**
+     * Update data barang
+     */
     public function update(Request $request, $id)
-        {
-            $request->validate([
-                'nama_barang' => 'required|string|max:255',
-                'id_kategori' => 'required|exists:kategori,id_kategori',
-                'harga_beli' => 'required|numeric|min:0',
-                'harga_jual' => 'required|numeric|min:0',
-                'stok_minimal' => 'required|integer|min:1',
-                'satuan' => 'required|string',
-                'status' => 'required|in:aktif,nonaktif'
-            ]);
+    {
+        $request->validate([
+            'kode_barang' => 'required|string|max:50|unique:barang,kode_barang,'.$id.',id_barang',
+            'nama_barang' => 'required|string|max:255',
+            'id_kategori' => 'required|exists:kategori,id_kategori',
+            'harga_beli' => 'required|numeric|min:0',
+            'harga_jual' => 'required|numeric|min:0',
+            'stok_minimal' => 'required|integer|min:1',
+            'satuan' => 'required|string',
+            'status' => 'required|in:aktif,nonaktif',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
 
-            $barang = Barang::findOrFail($id);
+        $barang = Barang::findOrFail($id);
+        
+        $data = [
+            'kode_barang' => $request->kode_barang,
+            'nama_barang' => $request->nama_barang,
+            'id_kategori' => $request->id_kategori,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'stok_minimal' => $request->stok_minimal,
+            'satuan' => $request->satuan,
+            'status' => $request->status,
+        ];
 
-            $barang->update([
-                'nama_barang' => $request->nama_barang,
-                'id_kategori' => $request->id_kategori,
-                'harga_beli' => $request->harga_beli,
-                'harga_jual' => $request->harga_jual,
-                'stok_minimal' => $request->stok_minimal,
-                'satuan' => $request->satuan,
-                'status' => $request->status,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data barang berhasil diupdate!'
-            ]);
+        // Handle Image Upload
+        if ($request->hasFile('gambar')) {
+            // Delete old image
+            if ($barang->gambar && \Illuminate\Support\Facades\Storage::disk('public')->exists($barang->gambar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($barang->gambar);
+            }
+            
+            $path = $request->file('gambar')->store('barang', 'public');
+            $data['gambar'] = $path;
         }
+
+        $barang->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data barang berhasil diupdate!'
+        ]);
+    }
 
 
     /**

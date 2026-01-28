@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     // Group Routes Kasir
     Route::middleware('isKasir')->prefix('kasir')->name('kasir.')->group(function() {
         Route::get('/stock', [App\Http\Controllers\KasirController::class, 'stock'])->name('stock');
+        Route::get('/laporan/export', [App\Http\Controllers\KasirController::class, 'exportLaporan'])->name('laporan.export');
         Route::get('/laporan', [App\Http\Controllers\KasirController::class, 'laporan'])->name('laporan');
     });
 
@@ -61,9 +62,14 @@ Route::middleware('auth')->group(function () {
         // === USERS / PENGGUNA ===
         Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
 
+        // === LAPORAN ===
+        Route::get('/laporan', [App\Http\Controllers\AdminController::class, 'laporan'])->name('admin.laporan');
+
         // === KATEGORI ===
         Route::post('/kategori', [KategoriController::class, 'store'])
             ->name('kategori.store');
+        Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])
+            ->name('kategori.destroy');
 
         // === STOCK ===
         Route::prefix('stock')->name('stock.')->group(function () {

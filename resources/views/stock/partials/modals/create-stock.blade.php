@@ -218,10 +218,18 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Kode Barang <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" 
-                                       x-model="newItem.kode_barang"
-                                       class="w-full border-gray-300 border rounded-xl px-4 py-3 font-mono focus:ring-2 focus:ring-green-500"
-                                       placeholder="CONTOH: SN001">
+                                <div class="flex gap-2">
+                                    <input type="text" 
+                                           x-model="newItem.kode_barang"
+                                           class="w-full border-gray-300 border rounded-xl px-4 py-3 font-mono focus:ring-2 focus:ring-green-500"
+                                           placeholder="CONTOH: SN001">
+                                    <button type="button" 
+                                            @click="generateRandomCode()"
+                                            class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl border border-gray-200 transition-colors tooltip"
+                                            title="Generate Code">
+                                        🎲
+                                    </button>
+                                </div>
                             </div>
                             
                             <div>
