@@ -30,12 +30,60 @@
 
         <form @submit.prevent="submitEditBarang()">
             <div class="space-y-4">
+                <!-- Kode Barang Section -->
+                <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Kode Barang</label>
+                    <div class="flex gap-2">
+                        <input type="text"
+                               x-model="editItem.kode_barang"
+                               class="w-full border-gray-300 border rounded-lg px-4 py-2 font-mono bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                               placeholder="Kode Barang..."
+                               required>
+                        <button type="button" @click="generateRandomCode('edit')"
+                                class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg border border-gray-200 transition-colors" title="Generate New Code">
+                            🎲
+                        </button>
+                        <button type="button" @click="printBarcode(editItem.kode_barang, editItem.nama_barang)"
+                                class="px-3 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg border border-indigo-100 transition-colors" title="Print Barcode">
+                            🖨️
+                        </button>
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700">Nama Barang</label>
                     <input type="text"
                            x-model="editItem.nama_barang"
                            class="w-full border-gray-300 border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                            required>
+                </div>
+
+                <!-- Image Upload in Edit -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Gambar Produk</label>
+                    <div class="flex items-start gap-4">
+                        <div class="relative w-24 h-24 bg-gray-100 rounded-lg border border-gray-200 overflow-hidden shrink-0">
+                             <template x-if="editItem.imagePreview">
+                                <img :src="editItem.imagePreview" class="w-full h-full object-cover">
+                             </template>
+                             <template x-if="!editItem.imagePreview && editItem.gambar">
+                                <img :src="'/storage/' + editItem.gambar" class="w-full h-full object-cover">
+                             </template>
+                             <template x-if="!editItem.imagePreview && !editItem.gambar">
+                                <div class="flex items-center justify-center h-full text-gray-400">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </div>
+                             </template>
+                        </div>
+                        
+                        <div class="flex-1">
+                             <label class="inline-block px-4 py-2 border border-gray-300 rounded-lg cursor-pointer bg-white hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">
+                                Pilih Gambar
+                                <input type="file" accept="image/*" @change="previewEditImage($event)" class="hidden">
+                            </label>
+                            <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG. Max: 2MB.</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">

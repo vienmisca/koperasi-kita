@@ -17,11 +17,20 @@ class KasirController extends Controller
         // Simple stats for dashboard
         $totalBarang = Barang::count();
         $stokRendah = Barang::whereColumn('stok', '<=', 'stok_minimal')->count();
-        // Placeholder for sales data
-        $penjualanHariIni = 0; 
-        $transaksiHariIni = 0;
+        
+        // Real sales data for today
+        $pembelianToday = \App\Models\Penjualan::whereDate('tanggal', date('Y-m-d'));
+        
+        $penjualanHariIni = (clone $pembelianToday)->sum('total'); 
+        $transaksiHariIni = (clone $pembelianToday)->count();
 
-        return view('kasir.dashboard', compact('totalBarang', 'stokRendah', 'penjualanHariIni', 'transaksiHariIni'));
+        // Recent Transactions (Limit 5)
+        $recentTransactions = \App\Models\Penjualan::with(['details.barang'])
+            ->latest('created_at')
+            ->limit(5)
+            ->get();
+
+        return view('kasir.dashboard', compact('totalBarang', 'stokRendah', 'penjualanHariIni', 'transaksiHariIni', 'recentTransactions'));
     }
 
     /**
@@ -45,14 +54,52 @@ class KasirController extends Controller
     }
 
     /**
-     * Laporan Penjualan
+     * Laporan Penjualan Real-time
      */
-    public function laporan()
+    public function laporan(Request $request)
     {
-        // Placeholder data for reports
-        // In real app, fetch from Transaksi model
-        $laporan = []; 
+        $startDate = $request->input('start_date', date('Y-m-01'));
+        $endDate = $request->input('end_date', date('Y-m-d'));
+
+        // Base Query
+        $query = \App\Models\Penjualan::with('user', 'details.barang')
+            ->whereDate('tanggal', '>=', $startDate)
+            ->whereDate('tanggal', '<=', $endDate);
+
+        // Stats Calculation
+        $totalPendapatan = (clone $query)->sum('total');
+        $totalTransaksi = (clone $query)->count();
+        $rataRata = $totalTransaksi > 0 ? $totalPendapatan / $totalTransaksi : 0;
+
+        // Get Paginated Data
+        $laporan = $query->latest('tanggal')->latest('created_at')->paginate(10);
+        $laporan->appends(['start_date' => $startDate, 'end_date' => $endDate]);
+
+        return view('kasir.laporan', compact(
+            'laporan', 
+            'totalPendapatan', 
+            'totalTransaksi', 
+            'rataRata',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    public function exportLaporan(Request $request)
+    {
+        $startDate = $request->input('start_date', date('Y-m-01'));
+        $endDate = $request->input('end_date', date('Y-m-d'));
         
-        return view('kasir.laporan', compact('laporan'));
+        $fileName = 'Laporan_Penjualan_' . date('d-m-Y', strtotime($startDate)) . '_sd_' . date('d-m-Y', strtotime($endDate)) . '.xls';
+
+        $data = \App\Models\Penjualan::with('user', 'details.barang')
+            ->whereDate('tanggal', '>=', $startDate)
+            ->whereDate('tanggal', '<=', $endDate)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response(view('kasir.laporan_excel', compact('data', 'startDate', 'endDate')))
+            ->header('Content-Type', 'application/vnd.ms-excel')
+            ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
     }
 }

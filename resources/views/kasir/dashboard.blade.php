@@ -27,7 +27,7 @@
             <div class="flex justify-between items-start">
                 <div>
                      <p class="text-sm text-gray-500 font-medium">Transaksi Hari Ini</p>
-                     <h3 class="text-3xl font-bold text-gray-800 mt-1">24</h3>
+                     <h3 class="text-3xl font-bold text-gray-800 mt-1">{{ number_format($transaksiHariIni) }}</h3>
                 </div>
                 <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
@@ -35,7 +35,7 @@
             </div>
             <div class="text-xs text-green-600 font-medium flex items-center gap-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                <span>+12% dari kemarin</span>
+                <span>Update Realtime</span>
             </div>
         </div>
         
@@ -44,7 +44,7 @@
              <div class="flex justify-between items-start">
                 <div>
                      <p class="text-sm text-gray-500 font-medium">Pendapatan Hari Ini</p>
-                     <h3 class="text-3xl font-bold text-gray-800 mt-1">Rp 1.2jt</h3>
+                     <h3 class="text-3xl font-bold text-gray-800 mt-1">Rp {{ number_format($penjualanHariIni, 0, ',', '.') }}</h3>
                 </div>
                 <div class="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-colors">
                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -52,16 +52,16 @@
             </div>
              <div class="text-xs text-green-600 font-medium flex items-center gap-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                <span>On target</span>
+                <span>Update Realtime</span>
             </div>
         </div>
 
         <!-- Card 3 (Low Stock) -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-32 hover:border-red-200 transition-colors group">
+        <a href="{{ route('kasir.stock') }}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-32 hover:border-red-200 transition-colors group">
              <div class="flex justify-between items-start">
                 <div>
                      <p class="text-sm text-gray-500 font-medium">Stok Menipis</p>
-                     <h3 class="text-3xl font-bold text-gray-800 mt-1">3 <span class="text-sm text-gray-400 font-normal">item</span></h3>
+                     <h3 class="text-3xl font-bold text-gray-800 mt-1">{{ $stokRendah }} <span class="text-sm text-gray-400 font-normal">item</span></h3>
                 </div>
                 <div class="w-10 h-10 bg-red-50 text-red-600 rounded-lg flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-colors">
                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -70,7 +70,7 @@
              <div class="text-xs text-red-500 font-medium hover:underline cursor-pointer">
                 Lihat detail &rarr;
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Recent Transactions Table (Expanded) -->
@@ -92,46 +92,32 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
-                    <!-- Placeholder Rows -->
+                    @forelse($recentTransactions as $trx)
                     <tr class="hover:bg-gray-50 transition-colors group">
                         <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-medium bg-white">
-                            #TRX-001
+                            #{{ $trx->no_penjualan }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">10:42 AM</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">Kopi Kapal Api x2, Gula...</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-800">Rp 45.000</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ $trx->created_at->format('H:i') }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-800 truncate max-w-xs">
+                             @php
+                                $items = $trx->details->map(function($d) {
+                                    return $d->barang->nama_barang . ($d->jumlah > 1 ? " x{$d->jumlah}" : '');
+                                })->join(', ');
+                            @endphp
+                            {{ \Illuminate\Support\Str::limit($items, 50) }}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-bold text-gray-800">Rp {{ number_format($trx->total, 0, ',', '.') }}</td>
                         <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
-                                Lunas
+                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100 uppercase">
+                                {{ $trx->metode_bayar }}
                             </span>
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-medium bg-white">
-                            #TRX-002
-                        </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">10:15 AM</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">Indomie Goreng x5</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-800">Rp 15.000</td>
-                         <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
-                                Lunas
-                            </span>
-                        </td>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada transaksi hari ini.</td>
                     </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-medium bg-white">
-                            #TRX-003
-                        </td>
-                         <td class="px-6 py-4 text-sm text-gray-500">09:55 AM</td>
-                        <td class="px-6 py-4 text-sm text-gray-800">Roti Tawar, Selai...</td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-800">Rp 32.500</td>
-                         <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
-                                Lunas
-                            </span>
-                        </td>
-                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
