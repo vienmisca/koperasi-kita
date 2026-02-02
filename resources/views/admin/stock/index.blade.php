@@ -24,22 +24,23 @@
 <div x-data="stockSystem()" x-init="init()" class="min-h-screen bg-gray-50 p-6">
     
     <!-- HEADER & ACTIONS -->
-    @include('stock.partials.actions')
+    @include('admin.stock.partials.actions')
 
     <!-- STATS GRID -->
-    @include('stock.partials.stats')
+    @include('admin.stock.partials.stats')
 
     <!-- TABLE LIST -->
-    @include('stock.partials.table')
+    @include('admin.stock.partials.table')
 
     <!-- MODALS -->
-    @include('stock.partials.modals.create-stock')
-    @include('stock.partials.modals.edit-stock')
-    @include('stock.partials.modals.create-category')
+    @include('admin.stock.partials.modals.create-stock')
+    @include('admin.stock.partials.modals.edit-stock')
+    @include('admin.stock.partials.modals.create-category')
+    @include('admin.stock.partials.modals.import-stock')
 
 </div>
 
 <!-- SCRIPTS -->
-@include('stock.partials.scripts')
+@include('admin.stock.partials.scripts')
 
 @endsection

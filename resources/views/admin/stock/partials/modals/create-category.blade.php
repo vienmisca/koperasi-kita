@@ -18,7 +18,7 @@
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
          @click.away="showKategoriModal = false">
 
-        <div class="flex justify-between items-center mb-6 border-b pb-4">
+        <div class="flex justify-between items-center mb-4 border-b pb-4">
             <h2 class="text-xl font-bold flex items-center gap-2 text-gray-900">
                 <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                 Tambah Kategori Baru
@@ -30,7 +30,7 @@
         </div>
 
         <form @submit.prevent="submitKategori()">
-            <div class="space-y-5">
+            <div class="space-y-3">
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700">Kode Kategori</label>
                     <input type="text"
@@ -52,12 +52,12 @@
                 <div>
                     <label class="block text-sm font-medium mb-1 text-gray-700">Deskripsi (opsional)</label>
                     <textarea x-model="kategoriBaru.deskripsi"
-                              class="w-full border-gray-300 border rounded-lg px-4 py-2 h-24 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                              class="w-full border-gray-300 border rounded-lg px-4 py-2 h-20 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                               placeholder="Deskripsi kategori..."></textarea>
                 </div>
             </div>
 
-            <div class="flex justify-end gap-3 mt-8 border-t pt-4">
+            <div class="flex justify-end gap-3 mt-6 border-t pt-4">
                 <button type="button"
                         @click="showKategoriModal = false"
                         class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium transition-colors">
@@ -72,7 +72,7 @@
         </form>
 
         <!-- Existing Categories List -->
-        <div class="mt-8 pt-6 border-t border-gray-100">
+        <div class="mt-6 pt-6 border-t border-gray-100">
             <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Daftar Kategori</h3>
             <div class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2">
                 <template x-for="kat in kategoriList" :key="kat.id_kategori">
