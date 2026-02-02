@@ -6,8 +6,16 @@
             mode: 'existing',
             today: new Date().toISOString().split('T')[0],
             showKategoriModal: false,
+            
+            // Edit Modal
             showEditModal: false, 
             editItem: { id_barang: null, nama_barang: '', harga_beli: '', harga_jual: '', stok_minimal: '', status: 'aktif', id_kategori: '', satuan: '' },
+            
+            // Import Modal
+            showImportModal: false,
+            fileSelected: null,
+            isImporting: false,
+
             kategoriBaru: {
                 kode_kategori: '',
                 nama_kategori: '',
@@ -345,7 +353,8 @@
                 }
                 
                 try {
-                    const response = await fetch('{{ route("stock.store") }}', {
+                    // FIX: Route updated to admin.stock.store
+                    const response = await fetch('{{ route("admin.stock.store") }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -468,7 +477,8 @@
                         formData.append('gambar', this.editItem.imageFile);
                     }
 
-                    const response = await fetch(`/stock/${this.editItem.id_barang}`, {
+                    // FIX: Route updated to /admin/stock/...
+                    const response = await fetch(`/admin/stock/${this.editItem.id_barang}`, {
                         method: 'POST', // Use POST with _method=PUT for files
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -496,7 +506,8 @@
                 if (!confirm(`Yakin ingin menghapus ${nama}?`)) return;
             
                 try {
-                    const response = await fetch(`/stock/${id}`, {
+                    // FIX: Route updated to /admin/stock/...
+                    const response = await fetch(`/admin/stock/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -579,6 +590,41 @@
                     }
                 } catch (error) {
                     this.notify('error', 'Error: ' + error.message);
+                }
+            },
+
+            // === IMPORT HANDLER ===
+            async submitImport() {
+                if (!this.fileSelected) return;
+                
+                this.isImporting = true;
+                const formData = new FormData();
+                formData.append('file', this.fileSelected);
+
+                try {
+                    const response = await fetch('{{ route("admin.stock.import") }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        this.notify('success', result.message);
+                        this.showImportModal = false;
+                        this.fileSelected = null;
+                        setTimeout(() => location.reload(), 2000);
+                    } else {
+                        this.notify('error', result.message);
+                    }
+                } catch (error) {
+                    this.notify('error', 'Import Gagal: ' + error.message);
+                } finally {
+                    this.isImporting = false;
                 }
             }
         }));

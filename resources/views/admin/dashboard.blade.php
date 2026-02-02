@@ -134,7 +134,7 @@
                 @endforelse
                 
                  <div class="text-center mt-4">
-                     <a href="{{ route('stock.index') }}" class="text-sm text-indigo-600 hover:underline">Lihat semua stok &rarr;</a>
+                     <a href="{{ route('admin.stock.index') }}" class="text-sm text-indigo-600 hover:underline">Lihat semua stok &rarr;</a>
                  </div>
             </div>
         </div>

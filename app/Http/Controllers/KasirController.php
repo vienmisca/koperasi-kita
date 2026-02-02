@@ -95,7 +95,8 @@ class KasirController extends Controller
         $data = \App\Models\Penjualan::with('user', 'details.barang')
             ->whereDate('tanggal', '>=', $startDate)
             ->whereDate('tanggal', '<=', $endDate)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('created_at', 'asc')
             ->get();
 
         return response(view('kasir.laporan_excel', compact('data', 'startDate', 'endDate')))

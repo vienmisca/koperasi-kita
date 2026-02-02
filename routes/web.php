@@ -72,21 +72,22 @@ Route::middleware('auth')->group(function () {
             ->name('kategori.destroy');
 
         // === STOCK ===
-        Route::prefix('stock')->name('stock.')->group(function () {
-
+        Route::prefix('admin/stock')->name('admin.stock.')->group(function () {
+             
             Route::get('/', [StockController::class, 'index'])->name('index');
             Route::post('/', [StockController::class, 'store'])->name('store');
+            Route::get('/export', [StockController::class, 'export'])->name('export');
+            Route::post('/import', [StockController::class, 'import'])->name('import');
+            Route::get('/template', [StockController::class, 'downloadTemplate'])->name('template');
 
             Route::put('/{id}', [StockController::class, 'update'])->name('update');
             Route::delete('/{id}', [StockController::class, 'destroy'])->name('destroy');
-
 
             Route::get('/mutasi', [StockController::class, 'mutasi'])->name('mutasi');
             Route::post('/add-stock/{id}', [StockController::class, 'addStock'])
                 ->name('add-stock');
             Route::post('/adjust/{id}', [StockController::class, 'adjustStock'])
                 ->name('adjust');
-                
         });
     });
 
