@@ -1,99 +1,49 @@
 <table>
     <thead>
         <tr>
-            <th colspan="11" style="font-weight: bold; font-size: 16px; text-align: center; height: 30px; vertical-align: middle;">
+            <th colspan="7" style="font-weight: bold; font-size: 16px; text-align: center; height: 30px; vertical-align: middle;">
                 LAPORAN PENJUALAN KOPERASI
             </th>
         </tr>
         <tr>
-            <th colspan="11" style="text-align: center;">
+            <th colspan="7" style="text-align: center;">
                 Periode: {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}
             </th>
         </tr>
         <tr>
-            <th colspan="11"></th>
+            <th colspan="7"></th>
         </tr>
-        <tr style="background-color: #f2f2f2; font-weight: bold;">
-            <th style="border: 1px solid #000000; text-align: center; font-weight: bold;">No</th>
-            <th style="border: 1px solid #000000; text-align: center; font-weight: bold;">Tanggal</th>
-            <th style="border: 1px solid #000000; text-align: center; font-weight: bold;">Waktu</th>
-            <th style="border: 1px solid #000000; text-align: center; font-weight: bold;">No Transaksi</th>
-            <th style="border: 1px solid #000000; text-align: center; font-weight: bold;">Kasir</th>
-            <th style="border: 1px solid #000000; text-align: left; font-weight: bold;">Nama Barang</th>
-            <th style="border: 1px solid #000000; text-align: right; font-weight: bold;">Harga</th>
-            <th style="border: 1px solid #000000; text-align: center; font-weight: bold;">Qty</th>
-            <th style="border: 1px solid #000000; text-align: right; font-weight: bold;">Subtotal</th>
-            <th style="border: 1px solid #000000; text-align: right; font-weight: bold;">Total Faktur</th>
-            <th style="border: 1px solid #000000; text-align: right; font-weight: bold;">Dibayar</th>
+        <tr style="background-color: #4472C4; color: #ffffff; font-weight: bold;">
+            <th style="border: 1px solid #000000; text-align: center; width: 130px;">Tanggal Transaksi</th>
+            <th style="border: 1px solid #000000; text-align: left; width: 250px;">Nama Barang</th>
+            <th style="border: 1px solid #000000; text-align: center; width: 50px;">Qty</th>
+            <th style="border: 1px solid #000000; text-align: right; width: 100px;">Harga Satuan</th>
+            <th style="border: 1px solid #000000; text-align: right; width: 100px;">Subtotal</th>
+            <th style="border: 1px solid #000000; text-align: right; width: 120px;">Total Transaksi</th>
+            <th style="border: 1px solid #000000; text-align: right; width: 100px;">Keuntungan</th>
         </tr>
     </thead>
     <tbody>
-        @php 
-            $no = 1; 
-            $currentDate = null;
-            $dailyTotal = 0;
-        @endphp
-
         @foreach($data as $trx)
             @php 
-                $trxDate = $trx->created_at->format('d/m/Y'); 
-                
-                // Show daily total IF date changes
-                if ($currentDate !== null && $currentDate !== $trxDate) {
-                    echo '<tr>';
-                    echo '<td colspan="8" style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #e6e6e6;">TOTAL PENDAPATAN TANGGAL ' . $currentDate . '</td>';
-                    echo '<td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #e6e6e6;">' . $dailyTotal . '</td>';
-                    echo '<td colspan="2" style="border: 1px solid #000000; background-color: #e6e6e6;"></td>';
-                    echo '</tr>';
-                    echo '<tr><td colspan="11"></td></tr>'; // Separator
-                    $dailyTotal = 0;
-                }
-                $currentDate = $trxDate;
+                $trxDate = $trx->created_at->format('d-m-Y H:i');
             @endphp
-
-            @foreach($trx->details as $key => $detail)
+            @foreach($trx->details as $detail)
                 @php 
                     $subtotal = $detail->harga * $detail->jumlah;
-                    $dailyTotal += $subtotal;
+                    $buyPrice = $detail->barang->harga_beli ?? 0;
+                    $profit = ($detail->harga - $buyPrice) * $detail->jumlah;
                 @endphp
                 <tr>
-                    @if($key === 0)
-                        <td style="border: 1px solid #000000; text-align: center; vertical-align: top;">{{ $no++ }}</td>
-                        <td style="border: 1px solid #000000; text-align: center; vertical-align: top;">{{ $trxDate }}</td>
-                        <td style="border: 1px solid #000000; text-align: center; vertical-align: top;">{{ $trx->created_at->format('H:i') }}</td>
-                        <td style="border: 1px solid #000000; text-align: center; vertical-align: top;">{{ $trx->no_penjualan }}</td>
-                        <td style="border: 1px solid #000000; text-align: center; vertical-align: top;">{{ $trx->user->name ?? '-' }}</td>
-                    @else
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                    @endif
-
-                    <td style="border: 1px solid #000000;">{{ $detail->barang->nama_barang ?? 'Item Terhapus' }}</td>
-                    <td style="border: 1px solid #000000; text-align: right;">{{ $detail->harga }}</td>
+                    <td style="border: 1px solid #000000; text-align: left;">{{ $trxDate }}</td>
+                    <td style="border: 1px solid #000000; text-align: left;">{{ $detail->barang->nama_barang ?? 'Item Terhapus' }}</td>
                     <td style="border: 1px solid #000000; text-align: center;">{{ $detail->jumlah }}</td>
-                    <td style="border: 1px solid #000000; text-align: right;">{{ $subtotal }}</td>
-
-                    @if($key === 0)
-                        <td style="border: 1px solid #000000; text-align: right; vertical-align: top;">{{ $trx->total }}</td>
-                        <td style="border: 1px solid #000000; text-align: right; vertical-align: top;">{{ $trx->bayar }}</td>
-                    @else
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                        <td style="border: 1px solid #000000; border-top: none;"></td>
-                    @endif
+                    <td style="border: 1px solid #000000; text-align: right;">{{ number_format($detail->harga, 0, ',', '.') }}</td>
+                    <td style="border: 1px solid #000000; text-align: right;">{{ number_format($subtotal, 0, ',', '.') }}</td>
+                    <td style="border: 1px solid #000000; text-align: right;">{{ number_format($trx->total, 0, ',', '.') }}</td>
+                    <td style="border: 1px solid #000000; text-align: right;">{{ number_format($profit, 0, ',', '.') }}</td>
                 </tr>
             @endforeach
         @endforeach
-
-        {{-- Final Total --}}
-        @if($currentDate !== null)
-            <tr>
-                <td colspan="8" style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #e6e6e6;">TOTAL PENDAPATAN TANGGAL {{ $currentDate }}</td>
-                <td style="border: 1px solid #000000; text-align: right; font-weight: bold; background-color: #e6e6e6;">{{ $dailyTotal }}</td>
-                <td colspan="2" style="border: 1px solid #000000; background-color: #e6e6e6;"></td>
-            </tr>
-        @endif
     </tbody>
 </table>

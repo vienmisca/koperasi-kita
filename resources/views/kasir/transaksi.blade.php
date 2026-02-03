@@ -47,8 +47,9 @@
             <!-- Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 pb-20">
                 <template x-for="product in filteredProducts" :key="product.id_barang">
-                    <button @click="addToCart(product)" 
-                            class="group bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg border border-gray-100 hover:border-blue-100 text-left flex flex-col h-full transition-all duration-200 hover:-translate-y-1 relative overflow-hidden">
+                    <button @click="product.stok > 0 ? addToCart(product) : null" 
+                            :class="product.stok <= 0 ? 'grayscale opacity-80 cursor-not-allowed' : 'hover:shadow-lg hover:border-blue-100 hover:-translate-y-1'"
+                            class="group bg-white rounded-2xl p-3 shadow-sm border border-gray-100 text-left flex flex-col h-full transition-all duration-200 relative overflow-hidden">
                         
                         <!-- Image Area -->
                         <div class="aspect-[4/3] w-full rounded-xl bg-gray-50 overflow-hidden relative mb-3">
@@ -59,6 +60,11 @@
                                  :src="'/storage/' + product.gambar" 
                                  loading="lazy"
                                  class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            
+                            <!-- Out of Stock Overlay -->
+                            <div x-show="product.stok <= 0" class="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                                <span class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform rotate-[-10deg] border-2 border-white">HABIS</span>
+                            </div>
                              
                              <div class="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold bg-white/90 shadow-sm border border-gray-100"
                                   :class="product.stok <= 5 ? 'text-red-500' : 'text-gray-600'">
@@ -188,6 +194,47 @@
             </button>
         </div>
     </div>
+    <!-- Success Modal -->
+    <div x-show="showSuccessModal" 
+         style="display: none;"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all scale-100"
+             @click.away="closeSuccessModal()">
+            
+            <!-- Modal Content -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-[bounce_1s_infinite]">
+                    <svg class="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Transaksi Berhasil!</h2>
+                <p class="text-gray-500 text-sm mt-1">Struk pembayaran telah diterbitkan</p>
+            </div>
+
+            <!-- Receipt Preview -->
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 max-h-[300px] overflow-y-auto shadow-inner">
+                 <div x-html="receiptPreviewHtml" class="font-mono text-[10px] leading-relaxed receipt-content"></div>
+            </div>
+
+            <!-- Actions -->
+            <div class="grid grid-cols-2 gap-3">
+                <button @click="printReceiptFromModal()" class="flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-xl font-medium transition-all active:scale-95 shadow-lg shadow-gray-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Cetak
+                </button>
+                <button @click="closeSuccessModal()" class="px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-all active:scale-95 shadow-lg shadow-blue-200">
+                    Selesai
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -199,6 +246,9 @@
             payAmount: '',
             customerName: 'Guest Customer',
             isLoading: false,
+            showSuccessModal: false,
+            receiptPreviewHtml: '',
+            lastReceiptData: null,
 
             init() {
                 window.addEventListener('keydown', (e) => {
@@ -341,8 +391,14 @@
                 })
                 .then(data => {
                     if (data.success) {
-                        this.notify('success', `Transaksi Berhasil! Kembalian: Rp ${this.formatNumber(data.kembalian)}`);
-                        this.printReceipt(data);
+                        // Notify success (optional, keeping it for sound)
+                        // this.notify('success', `Transaksi Berhasil!`);
+                        
+                        // Prepare receipt data
+                        this.lastReceiptData = data;
+                        this.generateReceiptPreview(data);
+                        this.showSuccessModal = true;
+                        this.playSound('success');
                         
                         // Update local stock visual
                         this.cart.forEach(cartItem => {
@@ -354,15 +410,65 @@
                         this.payAmount = '';
                     } else {
                         this.notify('error', data.message || 'Terjadi kesalahan');
+                        this.playSound('error');
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     this.notify('error', error.message || 'Gagal memproses transaksi.');
+                    this.playSound('error');
                 })
                 .finally(() => {
                     this.isLoading = false;
                 });
+            },
+
+            generateReceiptPreview(data) {
+                // Defines the structure for the modal preview (using simple HTML)
+                this.receiptPreviewHtml = `
+                    <div style="text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 4px;">{{ \App\Models\Setting::getValue('toko_nama', 'KOPERASI KITA') }}</div>
+                    <div style="text-align: center; margin-bottom: 8px;">{{ \App\Models\Setting::getValue('toko_alamat', '-') }}</div>
+                    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
+                    <div style="display: flex; justify-content: space-between;"><span>No:</span> <span>${data.no_penjualan}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Tgl:</span> <span>${data.tanggal}</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Kasir:</span> <span>${data.kasir}</span></div>
+                    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        ${data.items.map(item => `
+                            <tr><td colspan="3" style="padding-top: 4px; font-weight: bold;">${item.nama_barang}</td></tr>
+                            <tr>
+                                <td style="width: 20%;">${item.qty}x</td>
+                                <td style="width: 40%; text-align: right;">${this.formatNumber(item.harga)}</td>
+                                <td style="width: 40%; text-align: right;">${this.formatNumber(item.subtotal)}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
+                    <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 4px;">
+                        <span>TOTAL</span>
+                        <span>Rp ${this.formatNumber(data.total)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                        <span>Bayar</span>
+                        <span>Rp ${this.formatNumber(data.bayar)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+                        <span>Kembali</span>
+                        <span>Rp ${this.formatNumber(data.kembalian)}</span>
+                    </div>
+                    <div style="border-top: 1px dashed #ccc; margin: 8px 0;"></div>
+                    <div style="text-align: center; margin-top: 8px;">Terima Kasih</div>
+                `;
+            },
+
+            closeSuccessModal() {
+                this.showSuccessModal = false;
+            },
+
+            printReceiptFromModal() {
+                 if (this.lastReceiptData) {
+                    this.printReceipt(this.lastReceiptData);
+                 }
             },
 
             printReceipt(data) {
@@ -383,8 +489,8 @@
                         </style>
                     </head>
                     <body>
-                        <div class="center bold" style="font-size: 14px;">KOPERASI</div>
-                        <div class="center">Jl. Pendidikan No. 123</div>
+                        <div class="center bold" style="font-size: 14px;">{{ \App\Models\Setting::getValue('toko_nama', 'KOPERASI KITA') }}</div>
+                        <div class="center">{{ \App\Models\Setting::getValue('toko_alamat', '-') }}</div>
                         <div class="divider"></div>
                         <div>${data.no_penjualan}</div>
                         <div>${data.tanggal}</div>

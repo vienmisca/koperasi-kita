@@ -14,12 +14,15 @@ class StokMutasi extends Model
     
     protected $fillable = [
         'id_barang',
+        'no_mutasi',
         'tanggal',
         'jenis',
         'jumlah',
+        'satuan',
         'stok_sebelum',
         'stok_sesudah',
         'sumber',
+        'lokasi',
         'ref_id',
         'keterangan',
         'id_user'
@@ -37,7 +40,7 @@ class StokMutasi extends Model
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'id_barang');
+        return $this->belongsTo(Barang::class, 'id_barang')->withTrashed();
     }
 
     public function user()

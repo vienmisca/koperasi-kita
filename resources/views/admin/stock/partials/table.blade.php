@@ -6,33 +6,59 @@
                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                 Daftar Barang Koperasi
             </h2>
+            @if(request('search') || request('kategori') || request('stok_status'))
+            <p class="text-sm text-indigo-600 mt-1 font-medium">{{ $barang->total() }} barang ditemukan (Filtered)</p>
+            @else
             <p class="text-sm text-gray-600 mt-1">{{ $totalBarang ?? 0 }} barang terdaftar</p>
+            @endif
         </div>
         
-        <div class="flex items-center gap-3 w-full md:w-auto">
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            
+            <!-- Filter Status -->
+            <div class="relative w-full sm:w-40">
+                <select x-model="tableStatus" @change="filterTable()" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
+                    <option value="">Semua Status</option>
+                    <option value="aman">Aman</option>
+                    <option value="menipis">Menipis</option>
+                    <option value="habis">Habis</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+
+            <!-- Filter Kategori -->
+            <div class="relative w-full sm:w-48">
+                <select x-model="tableCategory" @change="filterTable()" class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none bg-white">
+                    <option value="">Semua Kategori</option>
+                    @foreach($kategori as $kat)
+                        <option value="{{ $kat->id_kategori }}">{{ $kat->nama_kategori }}</option>
+                    @endforeach
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-gray-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+            </div>
+
             <!-- Search -->
-            <div class="relative w-full md:w-64">
+            <div class="relative w-full sm:w-64">
                 <input type="text" 
                        x-model="tableSearch"
-                       @input.debounce.300ms="filterTable()"
-                       class="border border-gray-300 rounded-lg px-4 py-2 pl-10 text-sm w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-gray-50 focus:bg-white"
-                       placeholder="Cari nama atau kode barang...">
+                       @input.debounce.500ms="filterTable()"
+                       class="w-full border border-gray-300 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow"
+                       placeholder="Cari barang...">
                 <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
             </div>
-            
-            <!-- Filter Kategori -->
-            <select x-model="tableCategory"
-                    @change="filterTable()"
-                    class="border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-gray-50 focus:bg-white cursor-pointer">
-                <option value="">Semua Kategori</option>
-                @foreach($barang->pluck('kategori.nama_kategori')->unique() as $kategori)
-                    @if($kategori)
-                        <option value="{{ $kategori }}">{{ $kategori }}</option>
-                    @endif
-                @endforeach
-            </select>
+
+            <!-- Reset Filter Button (Conditional) -->
+            <template x-if="tableSearch || tableCategory || tableStatus">
+                <button @click="tableSearch=''; tableCategory=''; tableStatus=''; filterTable()" class="p-2 text-gray-400 hover:text-red-500 transition-colors" title="Reset Filter">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </template>
         </div>
     </div>
     
@@ -45,6 +71,7 @@
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Kategori</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Harga</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Stok</th>
+                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Supplier</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                     <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -130,6 +157,13 @@
                                 <div class="text-xs text-gray-500">{{ $item->satuan }}</div>
                             </div>
                         </div>
+                    </td>
+
+                    <!-- Supplier -->
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="text-sm text-gray-600 truncate max-w-[150px] block" title="{{ $item->supplier->nama ?? '-' }}">
+                            {{ $item->supplier->nama ?? '-' }}
+                        </span>
                     </td>
                     
                     <!-- Status -->

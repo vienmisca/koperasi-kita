@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Share pending password reset count with admin layout
+        view()->composer('layouts.admin', function ($view) {
+            $pendingResetCount = \App\Models\User::whereNotNull('pending_password')->count();
+            $view->with('pendingResetCount', $pendingResetCount);
+        });
     }
 }

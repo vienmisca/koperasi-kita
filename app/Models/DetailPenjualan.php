@@ -17,7 +17,13 @@ class DetailPenjualan extends Model
         'id_barang',
         'jumlah',
         'harga',
-        'subtotal'
+        'subtotal',
+        'nama_barang_snapshot',
+        'kode_barang_snapshot',
+        'harga_beli_snapshot',
+        'harga_jual_snapshot',
+        'kategori_snapshot',
+        'satuan_snapshot'
     ];
 
     public function penjualan()
@@ -27,6 +33,6 @@ class DetailPenjualan extends Model
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'id_barang');
+        return $this->belongsTo(Barang::class, 'id_barang')->withTrashed();
     }
 }

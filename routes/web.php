@@ -59,17 +59,31 @@ Route::middleware('auth')->group(function () {
     */
     Route::middleware('isAdmin')->group(function () {
 
+        // === SETTINGS ===
+        Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('/settings', [App\Http\Controllers\SettingController::class, 'update'])->name('admin.settings.update');
+
         // === USERS / PENGGUNA ===
         Route::resource('users', UserController::class)->except(['create', 'edit', 'show']);
+        Route::post('users/{user}/approve-reset', [App\Http\Controllers\Auth\ManualPasswordResetController::class, 'approve'])->name('admin.users.approve-reset');
+        Route::post('users/{user}/reject-reset', [App\Http\Controllers\Auth\ManualPasswordResetController::class, 'reject'])->name('admin.users.reject-reset');
 
         // === LAPORAN ===
+        Route::get('/laporan/export', [App\Http\Controllers\AdminController::class, 'exportLaporan'])->name('admin.laporan.export');
         Route::get('/laporan', [App\Http\Controllers\AdminController::class, 'laporan'])->name('admin.laporan');
+        
+        // API Stats
+        Route::get('/api/dashboard/stats', [App\Http\Controllers\AdminController::class, 'dashboardStats'])->name('admin.dashboard.stats');
+        Route::get('/api/laporan/stats', [App\Http\Controllers\AdminController::class, 'laporanStats'])->name('admin.laporan.stats');
 
         // === KATEGORI ===
         Route::post('/kategori', [KategoriController::class, 'store'])
             ->name('kategori.store');
         Route::delete('/kategori/{id}', [KategoriController::class, 'destroy'])
             ->name('kategori.destroy');
+
+        // === SUPPLIER ===
+        Route::resource('suppliers', \App\Http\Controllers\SupplierController::class)->only(['store', 'update', 'index']);
 
         // === STOCK ===
         Route::prefix('admin/stock')->name('admin.stock.')->group(function () {
@@ -84,6 +98,9 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{id}', [StockController::class, 'destroy'])->name('destroy');
 
             Route::get('/mutasi', [StockController::class, 'mutasi'])->name('mutasi');
+            Route::post('/mutasi/store', [StockController::class, 'storeMutasi'])->name('mutasi.store');
+            Route::get('/mutasi/export', [StockController::class, 'exportMutasi'])->name('mutasi.export');
+
             Route::post('/add-stock/{id}', [StockController::class, 'addStock'])
                 ->name('add-stock');
             Route::post('/adjust/{id}', [StockController::class, 'adjustStock'])

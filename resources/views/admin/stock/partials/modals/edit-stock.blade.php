@@ -16,13 +16,13 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-         @click.away="showEditModal = false">
+         @click.away="closeModal()">
 
         <div class="flex justify-between items-center mb-5 border-b pb-3">
             <h2 class="text-xl font-bold flex items-center gap-2 text-gray-900">
                 <span>✏️</span> Edit Barang
             </h2>
-            <button @click="showEditModal = false"
+            <button @click="closeModal()"
                     class="text-gray-400 hover:text-red-500 transition-colors text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-50">
                 ×
             </button>
@@ -61,7 +61,8 @@
                             @endforeach
                         </select>
                     </div>
-                </div>
+
+
 
                 <!-- Nama Barang -->
                 <div>
@@ -164,7 +165,7 @@
 
             <div class="flex justify-end gap-3 mt-6 border-t pt-4">
                 <button type="button"
-                        @click="showEditModal = false"
+                        @click="closeModal()"
                         class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium transition-colors text-sm">
                     Batal
                 </button>

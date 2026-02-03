@@ -4,51 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Barang extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'barang';
-    protected $primaryKey = 'id_barang';
+    protected $primaryKey = 'id_barang'; // Adjust based on existing schema
     
-    protected $fillable = [
-        'kode_barang',
-        'nama_barang',
-        'id_kategori',
-        'harga_beli',
-        'harga_jual',
-        'stok',
-        'satuan',
-        'stok_minimal',
-        'deskripsi',
-        'status',
-        'gambar'
-    ];
-
-
-    protected function casts(): array
-    {
-        return [
-            'harga_beli' => 'decimal:2',
-            'harga_jual' => 'decimal:2',
-            'stok' => 'integer',
-            'stok_minimal' => 'integer'
-        ];
-    }
+    // Ensure id_barang is guarded or fillable as needed. 
+    // Assuming guarded id, fillable the rest.
+    protected $guarded = ['id_barang'];
 
     public function kategori()
     {
-        return $this->belongsTo(Kategori::class, 'id_kategori');
+        return $this->belongsTo(Kategori::class, 'id_kategori', 'id_kategori');
     }
 
-    public function detailPenjualan()
+    public function supplier()
     {
-        return $this->hasMany(DetailPenjualan::class, 'id_barang');
-    }
-
-    public function stokMutasi()
-    {
-        return $this->hasMany(StokMutasi::class, 'id_barang');
+        return $this->belongsTo(Supplier::class, 'id_supplier');
     }
 }

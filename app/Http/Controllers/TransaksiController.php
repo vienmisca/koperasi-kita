@@ -80,13 +80,20 @@ class TransaksiController extends Controller
                 
                 $subtotal = $item['price'] * $item['quantity'];
                 
-                // Simpan detail
+                // Simpan detail (dengan Snapshot Data)
                 DetailPenjualan::create([
                     'id_penjualan' => $penjualan->id_penjualan,
                     'id_barang' => $item['id_barang'],
                     'jumlah' => $item['quantity'],
                     'harga' => $item['price'],
-                    'subtotal' => $subtotal
+                    'subtotal' => $subtotal,
+                    // Snapshot Data (Agar laporan tetap aman walau barang dihapus)
+                    'nama_barang_snapshot' => $barang->nama_barang,
+                    'kode_barang_snapshot' => $barang->kode_barang,
+                    'harga_beli_snapshot' => $barang->harga_beli,
+                    'harga_jual_snapshot' => $barang->harga_jual,
+                    'kategori_snapshot' => $barang->kategori->nama_kategori ?? null,
+                    'satuan_snapshot' => $barang->satuan
                 ]);
                 
                 // Update stok barang

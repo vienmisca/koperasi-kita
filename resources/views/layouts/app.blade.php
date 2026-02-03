@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Koperasi' }}</title>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
     
     <!-- Alpine.js for interactivity -->
     <script src="//unpkg.com/alpinejs" defer></script>
@@ -55,9 +57,7 @@
             <!-- LOGO -->
             <div class="h-16 flex items-center px-6 border-b border-gray-50 bg-white">
                 <div class="flex items-center gap-2.5 font-bold text-xl text-gray-800 tracking-tight">
-                    <div class="text-indigo-600">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    </div>
+<img src="{{ asset('images/logo.png') }}" class="w-8 h-8 object-contain transform hover:scale-105 transition-transform" alt="Logo">
                     <span>KOPERASI</span>
                 </div>
                 <button @click="sidebarOpen = false" class="md:hidden ml-auto text-gray-400 hover:text-gray-600">
@@ -93,20 +93,14 @@
                     <span class="font-medium">Cek Stok</span>
                 </a>
                 
-                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3">Pengaturan</p>
 
-                <a href="#"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span class="font-medium">Akun & Setting</span>
-                </a>
             </nav>
 
             <!-- USER INFO -->
             <div class="p-4 border-t border-gray-100">
                 <div class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100">
-                    <img class="w-10 h-10 rounded-full bg-indigo-100 object-cover"
-                         src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=6366f1&color=fff">
+                    <img class="w-10 h-10 rounded-full bg-white object-contain border border-gray-200 p-0.5"
+                         src="{{ asset('images/wee-maskot.png') }}" alt="Wee Mascot">
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm text-gray-900 truncate">{{ auth()->user()->name }}</p>
                         <p class="text-xs text-gray-500">Kasir</p>
@@ -150,8 +144,8 @@
                     <!-- User Menu -->
                     <div class="flex items-center gap-2 relative" x-data="{ open: false }" @click.away="open = false">
                         <button @click="open = !open" class="flex items-center gap-2 hover:bg-gray-50 p-1.5 pr-3 rounded-full border border-transparent hover:border-gray-200 transition-all">
-                            <img class="w-8 h-8 rounded-full bg-indigo-100 object-cover"
-                                 src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=6366f1&color=fff">
+                            <img class="w-8 h-8 rounded-full bg-white object-contain border border-gray-200 p-0.5"
+                                 src="{{ asset('images/wee-maskot.png') }}" alt="Wee">
                             <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>
                         
@@ -170,13 +164,9 @@
                             </div>
                             
                             <div class="py-1">
-                                <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
+                                <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     Profile
-                                </a>
-                                <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    Settings
                                 </a>
                             </div>
 

@@ -27,4 +27,32 @@ class KategoriController extends Controller
             'data' => $kategori
         ]);
     }
+    public function destroy($id)
+    {
+        $kategori = Kategori::find($id);
+
+        if (!$kategori) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kategori tidak ditemukan'
+            ], 404);
+        }
+
+        // Check if category is used by any products
+        $isUsed = \App\Models\Barang::where('id_kategori', $id)->exists();
+
+        if ($isUsed) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kategori tidak bisa dihapus karena sedang digunakan oleh produk.'
+            ], 400); // Bad Request
+        }
+
+        $kategori->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori berhasil dihapus'
+        ]);
+    }
 }

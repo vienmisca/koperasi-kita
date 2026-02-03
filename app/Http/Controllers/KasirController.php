@@ -38,7 +38,7 @@ class KasirController extends Controller
      */
     public function transaksi()
     {
-        $products = Barang::where('status', 'aktif')->where('stok', '>', 0)->get();
+        $products = Barang::where('status', 'aktif')->get();
         return view('kasir.transaksi', compact('products'));
     }
 
@@ -90,7 +90,7 @@ class KasirController extends Controller
         $startDate = $request->input('start_date', date('Y-m-01'));
         $endDate = $request->input('end_date', date('Y-m-d'));
         
-        $fileName = 'Laporan_Penjualan_' . date('d-m-Y', strtotime($startDate)) . '_sd_' . date('d-m-Y', strtotime($endDate)) . '.xls';
+        $fileName = 'Laporan_Penjualan_' . date('d-m-Y', strtotime($startDate)) . '_sd_' . date('d-m-Y', strtotime($endDate)) . '.xlsx';
 
         $data = \App\Models\Penjualan::with('user', 'details.barang')
             ->whereDate('tanggal', '>=', $startDate)
@@ -99,8 +99,54 @@ class KasirController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return response(view('kasir.laporan_excel', compact('data', 'startDate', 'endDate')))
-            ->header('Content-Type', 'application/vnd.ms-excel')
-            ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
+        // Prepare Excel Data
+        $excelData = [];
+        
+        // Titles
+        $excelData[] = ['<center><b>LAPORAN PENJUALAN KOPERASI</b></center>'];
+        $excelData[] = ['<center>Periode: ' . date('d M Y', strtotime($startDate)) . ' s/d ' . date('d M Y', strtotime($endDate)) . '</center>'];
+        $excelData[] = []; // Empty row
+        
+        // Table Header
+        $excelData[] = [
+            '<b>Tanggal Transaksi</b>',
+            '<b>Nama Barang</b>',
+            '<b>Qty</b>',
+            '<b>Harga Satuan</b>',
+            '<b>Subtotal</b>',
+            '<b>Total Transaksi</b>',
+            '<b>Keuntungan</b>'
+        ];
+
+        // Rows
+        foreach ($data as $trx) {
+            $trxDate = $trx->created_at->format('d-m-Y H:i');
+            
+            foreach ($trx->details as $detail) {
+                $subtotal = $detail->harga * $detail->jumlah;
+                $buyPrice = $detail->harga_beli_snapshot ?? $detail->barang->harga_beli ?? 0;
+                $profit = ($detail->harga - $buyPrice) * $detail->jumlah;
+                $productName = $detail->nama_barang_snapshot ?? $detail->barang->nama_barang ?? 'Item Terhapus';
+
+                if ($detail->barang && $detail->barang->trashed() && !$detail->nama_barang_snapshot) {
+                    $productName .= ' (Nonaktif)';
+                }
+
+                $excelData[] = [
+                    $trxDate,
+                    $productName,
+                    $detail->jumlah,
+                    $detail->harga, // format later or let excel handle? prefer raw number for calculations
+                    $subtotal,
+                    $trx->total,
+                    $profit
+                ];
+            }
+        }
+
+        // Generate and Stream Download
+        $xlsx = \Shuchkin\SimpleXLSXGen::fromArray($excelData);
+        $xlsx->downloadAs($fileName);
+        exit;
     }
 }
