@@ -57,7 +57,7 @@
         </div>
 
         <!-- Card 3 (Low Stock) -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-32 hover:border-red-200 transition-colors group">
+        <a href="{{ route('kasir.stock') }}" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between h-32 hover:border-red-200 transition-colors group">
              <div class="flex justify-between items-start">
                 <div>
                      <p class="text-sm text-gray-500 font-medium">Stok Menipis</p>

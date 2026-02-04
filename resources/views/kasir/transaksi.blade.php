@@ -87,7 +87,7 @@
                             </div>
                         </div>
 
-                        <!-- Info -->
+                        <!-- Content -->
                         <div class="flex-1 flex flex-col">
                             <h3 class="font-bold text-gray-800 text-[13px] leading-tight mb-1 line-clamp-2" x-text="product.nama_barang"></h3>
                             
@@ -98,7 +98,7 @@
                                 </span>
                             </div>
                         </div>
-                    </div>
+                    </button>
                 </template>
             </div>
         </div>
@@ -188,6 +188,23 @@
                  <span class="text-base font-bold text-green-600 font-mono">Rp <span x-text="formatNumber(change)"></span></span>
             </div>
 
+        <!-- 6. Input & Actions -->
+        <div class="px-6 pb-6 bg-white space-y-3">
+            <div>
+                 <div class="relative w-full">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                         <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                     </div>
+                     <input type="number" 
+                            x-model.number="payAmount"
+                            min="0"
+                            max="100000000"
+                            @input="if($el.value < 0) $el.value = 0; if($el.value > 100000000) $el.value = 100000000;"
+                            class="w-full bg-gray-50 border-none rounded-xl py-3 pl-10 pr-3 text-sm font-semibold placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:bg-white transition-all"
+                            placeholder="Jumlah Bayar (Rp)">
+                </div>
+            </div>
+            
             <button @click="processCheckout()"
                     :disabled="cart.length === 0 || payAmount < total || isLoading"
                     class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-200 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -288,6 +305,7 @@
                 return (this.payAmount || 0) - this.total;
             },
             
+            
             formatNumber(num) {
                 return new Intl.NumberFormat('id-ID').format(num);
             },
@@ -310,7 +328,6 @@
                 const item = this.cart[index];
                 const product = this.products.find(p => p.id_barang === item.id_barang);
                 const newQty = item.qty + change;
-                
                 if (newQty <= 0) {
                     this.removeItem(index);
                     return;
@@ -377,6 +394,7 @@
                         this.generateReceiptPreview(data);
                         this.showSuccessModal = true;
                         
+                        // Update local stock visual
                         this.cart.forEach(cartItem => {
                             const product = this.products.find(p => p.id_barang === cartItem.id_barang);
                             if (product) product.stok -= cartItem.qty;

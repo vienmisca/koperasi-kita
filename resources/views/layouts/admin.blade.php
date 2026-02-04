@@ -75,33 +75,31 @@
                      <span class="font-medium">Kelola User</span>
                 </a>
 
-                <div x-data="{ open: {{ request()->routeIs('stock.*') ? 'true' : 'false' }} }" class="space-y-1">
+                <div x-data="{ open: {{ request()->routeIs('admin.stock.*') ? 'true' : 'false' }} }" class="space-y-1">
                     <button @click="open = !open"
-                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group hover:bg-gray-50 {{ request()->routeIs('stock.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600' }}">
+                            class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group hover:bg-gray-50 {{ request()->routeIs('admin.stock.*') ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600' }}">
                         <span class="flex items-center gap-3">
-                            <svg class="w-5 h-5 {{ request()->routeIs('stock.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            <svg class="w-5 h-5 {{ request()->routeIs('admin.stock.*') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                             <span class="font-medium">Manajemen Stok</span>
                         </span>
                         <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </button>
 
                     <div x-show="open" x-transition class="ml-4 pl-3 border-l-2 border-gray-100 space-y-1 my-1">
-                        <a href="{{ route('stock.index') }}" 
-                           class="block px-3 py-2 rounded-lg text-sm transition-colors {{ request()->routeIs('stock.index') ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }}">
+                        <a href="{{ route('admin.stock.index') }}" 
+                           class="block px-3 py-2 rounded-lg text-sm transition-colors {{ request()->routeIs('admin.stock.index') ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }}">
                             Daftar Barang
                         </a>
-                        <a href="{{ route('stock.mutasi') }}" 
-                           class="block px-3 py-2 rounded-lg text-sm transition-colors {{ request()->routeIs('stock.mutasi') ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }}">
+                        <a href="{{ route('admin.stock.mutasi') }}" 
+                           class="block px-3 py-2 rounded-lg text-sm transition-colors {{ request()->routeIs('admin.stock.mutasi') ? 'text-indigo-600 font-medium bg-indigo-50' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50' }}">
                             Riwayat Mutasi
                         </a>
                     </div>
                 </div>
 
-                <!-- Duplicate User Link Removed -->
-
-                <a href="#"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                     <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <a href="{{ route('admin.laporan') }}"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group {{ request()->routeIs('admin.laporan') ? 'bg-indigo-50 text-indigo-600 shadow-sm' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900' }}">
+                     <svg class="w-5 h-5 {{ request()->routeIs('admin.laporan') ? 'text-indigo-600' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                      <span class="font-medium">Laporan Lengkap</span>
                 </a>
                 

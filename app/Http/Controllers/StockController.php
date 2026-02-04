@@ -33,7 +33,7 @@ class StockController extends Controller
             ->count();
         $barangKosong = Barang::where('stok', 0)->count();
         
-        return view('stock.index', compact(
+        return view('admin.stock.index', compact(
             'barang',
             'kategori',
             'totalBarang',
@@ -109,15 +109,12 @@ class StockController extends Controller
                     'satuan' => 'required|string',
                     'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048' // ← validasi gambar
                 ]);
-
                 
                 if ($request->hasFile('gambar')) {
                     $path = $request->file('gambar')->store('barang', 'public');
                 } else {
                     $path = null;
                 }
-                
-
                 
                 $barang = Barang::create([
                     'kode_barang' => $request->kode_barang,
@@ -133,7 +130,6 @@ class StockController extends Controller
                     'gambar' => $path,
                 ]);
 
-                
                 // Catat mutasi stok awal
                 if ($request->stok_awal > 0) {
                     StokMutasi::create([
@@ -202,7 +198,7 @@ class StockController extends Controller
         $mutasi = $query->paginate(20);
         $barangList = Barang::orderBy('nama_barang')->get();
         
-        return view('stock.mutasi', compact('mutasi', 'barangList'));
+        return view('admin.stock.mutasi', compact('mutasi', 'barangList'));
     }
 
     /**
@@ -211,7 +207,7 @@ class StockController extends Controller
     public function create()
     {
         $kategori = Kategori::all();
-        return view('stock.create', compact('kategori'));
+        return view('admin.stock.create', compact('kategori'));
     }
 
     /**
@@ -344,76 +340,89 @@ class StockController extends Controller
         $barang = Barang::with(['kategori', 'stokMutasi.user'])
             ->findOrFail($id);
         
-        return view('stock.show', compact('barang'));
+        return view('admin.stock.show', compact('barang'));
     }
 
     /**
      * Update data barang
      */
     public function update(Request $request, $id)
-        {
-            $request->validate([
-                'nama_barang' => 'required|string|max:255',
-                'id_kategori' => 'required|exists:kategori,id_kategori',
-                'harga_beli' => 'required|numeric|min:0',
-                'harga_jual' => 'required|numeric|min:0',
-                'stok_minimal' => 'required|integer|min:1',
-                'satuan' => 'required|string',
-                'status' => 'required|in:aktif,nonaktif'
-            ]);
+    {
+        $request->validate([
+            'kode_barang' => 'required|string|max:50|unique:barang,kode_barang,'.$id.',id_barang',
+            'nama_barang' => 'required|string|max:255',
+            'id_kategori' => 'required|exists:kategori,id_kategori',
+            'harga_beli' => 'required|numeric|min:0',
+            'harga_jual' => 'required|numeric|min:0',
+            'stok_minimal' => 'required|integer|min:1',
+            'satuan' => 'required|string',
+            'status' => 'required|in:aktif,nonaktif',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
 
-            $barang = Barang::findOrFail($id);
+        $barang = Barang::findOrFail($id);
+        
+        $data = [
+            'kode_barang' => $request->kode_barang,
+            'nama_barang' => $request->nama_barang,
+            'id_kategori' => $request->id_kategori,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'stok_minimal' => $request->stok_minimal,
+            'satuan' => $request->satuan,
+            'status' => $request->status,
+        ];
 
-            $barang->update([
-                'nama_barang' => $request->nama_barang,
-                'id_kategori' => $request->id_kategori,
-                'harga_beli' => $request->harga_beli,
-                'harga_jual' => $request->harga_jual,
-                'stok_minimal' => $request->stok_minimal,
-                'satuan' => $request->satuan,
-                'status' => $request->status,
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Data barang berhasil diupdate!'
-            ]);
+        // Handle Image Upload
+        if ($request->hasFile('gambar')) {
+            // Delete old image
+            if ($barang->gambar && \Illuminate\Support\Facades\Storage::disk('public')->exists($barang->gambar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($barang->gambar);
+            }
+            
+            $path = $request->file('gambar')->store('barang', 'public');
+            $data['gambar'] = $path;
         }
 
+        $barang->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data barang berhasil diupdate!'
+        ]);
+    }
 
     /**
      * Hapus barang
      */
     public function destroy($id)
-        {
-            $barang = Barang::findOrFail($id);
+    {
+        $barang = Barang::findOrFail($id);
 
-            DB::beginTransaction();
+        DB::beginTransaction();
 
-            try {
-                // ❗ HAPUS DULU MUTASI STOK BARANG INI
-                \App\Models\StokMutasi::where('id_barang', $id)->delete();
+        try {
+            // ❗ HAPUS DULU MUTASI STOK BARANG INI
+            \App\Models\StokMutasi::where('id_barang', $id)->delete();
 
-                // Baru hapus barangnya
-                $barang->delete();
+            // Baru hapus barangnya
+            $barang->delete();
 
-                DB::commit();
+            DB::commit();
 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Barang dan riwayat mutasinya berhasil dihapus!'
-                ]);
-            } catch (\Exception $e) {
-                DB::rollBack();
+            return response()->json([
+                'success' => true,
+                'message' => 'Barang dan riwayat mutasinya berhasil dihapus!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal menghapus: ' . $e->getMessage()
-                ], 500);
-            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus: ' . $e->getMessage()
+            ], 500);
         }
-
-
+    }
 
     /**
      * API untuk get barang by kategori (untuk dropdown)
@@ -453,5 +462,211 @@ class StockController extends Controller
             ->get();
         
         return response()->json($barang);
+    }
+
+    /**
+     * Export data stok ke Excel
+     */
+    public function export()
+    {
+        $barang = Barang::with('kategori')->orderBy('nama_barang')->get();
+        $fileName = 'Laporan_Stok_Barang_' . date('d-m-Y') . '.xls';
+
+        return response(view('admin.stock.laporan_excel', compact('barang')))
+            ->header('Content-Type', 'application/vnd.ms-excel')
+            ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
+    }
+
+    /**
+     * Download Template Import CSV
+     */
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="Template_Import_Stok.csv"',
+        ];
+
+        $columns = ['Kode Barang', 'Nama Barang', 'Kategori', 'Stok', 'Satuan', 'Harga Beli', 'Harga Jual'];
+        $example = ['BRG001', 'Contoh Barang', 'Umum', '10', 'pcs', '5000', '7000'];
+
+        $callback = function() use ($columns, $example) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fputcsv($file, $example);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Import data stok dari CSV
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:2048'
+        ]);
+
+        $file = $request->file('file');
+        
+        // Baca file csv
+        $csvData = array_map('str_getcsv', file($file->getPathname()));
+        
+        // Helper untuk parse CSV line yang mungkin pakai semicolon
+        $parseLine = function($line) {
+             if (count($line) == 1 && strpos($line[0], ';') !== false) {
+                 return explode(';', $line[0]);
+             }
+             return $line;
+        };
+
+        if (empty($csvData)) {
+             return response()->json(['success' => false, 'message' => 'File kosong.'], 400);
+        }
+
+        DB::beginTransaction();
+        
+        try {
+            $headerFound = false;
+            $idx = [];
+            $imported = 0;
+            $updated = 0;
+
+            foreach ($csvData as $rawRow) {
+                // Parse delimiter row
+                $row = $parseLine($rawRow);
+                
+                // Bersihkan Input
+                $cleanRow = array_map(function($item) {
+                     return strtolower(trim($item));
+                }, $row);
+
+                // Deteksi Header
+                if (!$headerFound) {
+                    // Cari kata kunci 'kode barang'
+                    $keyKode = false;
+                    foreach($cleanRow as $k => $v) {
+                        if($v === 'kode barang' || $v === 'kode' || $v === 'kode_barang') $keyKode = $k;
+                    }
+
+                    if ($keyKode !== false) {
+                        $headerFound = true;
+                        // Mapping Index
+                        $idx['kode'] = $keyKode;
+                        
+                        // Cari index lain berdasarkan header
+                         foreach($cleanRow as $k => $v) {
+                            if($v === 'nama barang' || $v === 'nama') $idx['nama'] = $k;
+                            if($v === 'kategori') $idx['kategori'] = $k;
+                            if($v === 'stok') $idx['stok'] = $k;
+                            if($v === 'satuan') $idx['satuan'] = $k;
+                            if($v === 'harga beli' || $v === 'beli') $idx['beli'] = $k;
+                            if($v === 'harga jual' || $v === 'jual') $idx['jual'] = $k;
+                         }
+                    }
+                    continue; 
+                }
+
+                // Proses Data Row
+                // Pastikan index kode ada
+                if (!isset($idx['kode']) || !isset($row[$idx['kode']])) continue;
+                
+                $kode = trim($row[$idx['kode']]);
+                if (empty($kode)) continue;
+
+                $nama = isset($idx['nama']) ? $row[$idx['nama']] : 'Unnamed';
+                $kategoriName = isset($idx['kategori']) ? $row[$idx['kategori']] : 'Umum';
+                $stokCsv = isset($idx['stok']) ? $this->cleanNumber($row[$idx['stok']]) : 0;
+                $satuan = isset($idx['satuan']) ? $row[$idx['satuan']] : 'pcs';
+                $hargaBeli = isset($idx['beli']) ? $this->cleanNumber($row[$idx['beli']]) : 0;
+                $hargaJual = isset($idx['jual']) ? $this->cleanNumber($row[$idx['jual']]) : 0;
+
+                // 1. Handle Kategori
+                $kategori = Kategori::firstOrCreate(
+                    ['nama_kategori' => $kategoriName],
+                    ['kode_kategori' => strtoupper(substr($kategoriName, 0, 3)), 'deskripsi' => 'Auto Import']
+                );
+
+                // 2. Cek Barang
+                $barang = Barang::where('kode_barang', $kode)->first();
+
+                if ($barang) {
+                    // Update
+                    $barang->nama_barang = $nama;
+                    $barang->id_kategori = $kategori->id_kategori;
+                    $barang->harga_beli = $hargaBeli;
+                    $barang->harga_jual = $hargaJual;
+                    $barang->satuan = $satuan;
+                    
+                    // Cek Stok
+                    if ($barang->stok != $stokCsv) {
+                        $diff = $stokCsv - $barang->stok;
+                        $oldStok = $barang->stok;
+                        $barang->stok = $stokCsv;
+
+                        // Log Mutasi
+                        StokMutasi::create([
+                            'id_barang' => $barang->id_barang,
+                            'tanggal' => now(),
+                            'jenis' => $diff > 0 ? 'MASUK' : 'KELUAR',
+                            'jumlah' => abs($diff),
+                            'stok_sebelum' => $oldStok,
+                            'stok_sesudah' => $stokCsv,
+                            'sumber' => 'adjustment',
+                            'keterangan' => 'Import CSV Update',
+                            'id_user' => Auth::id() ?? 1
+                        ]);
+                    }
+                    $barang->save();
+                    $updated++;
+                } else {
+                    // Create
+                    $barang = Barang::create([
+                        'kode_barang' => $kode,
+                        'nama_barang' => $nama,
+                        'id_kategori' => $kategori->id_kategori,
+                        'harga_beli' => $hargaBeli,
+                        'harga_jual' => $hargaJual,
+                        'stok' => $stokCsv,
+                        'satuan' => $satuan,
+                        'stok_minimal' => 5,
+                        'status' => 'aktif'
+                    ]);
+
+                    if ($stokCsv > 0) {
+                        StokMutasi::create([
+                            'id_barang' => $barang->id_barang,
+                            'tanggal' => now(),
+                            'jenis' => 'MASUK',
+                            'jumlah' => $stokCsv,
+                            'stok_sebelum' => 0,
+                            'stok_sesudah' => $stokCsv,
+                            'sumber' => 'adjustment',
+                            'keterangan' => 'Import CSV New',
+                            'id_user' => Auth::id() ?? 1
+                        ]);
+                    }
+                    $imported++;
+                }
+            }
+
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Import Berhasil! $imported baru, $updated diupdate."
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
+    private function cleanNumber($val) {
+        if (is_numeric($val)) return $val;
+        return (int) preg_replace('/[^0-9]/', '', $val);
     }
 }

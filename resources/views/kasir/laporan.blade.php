@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="animate-fade-in-down">
+<div class="animate-fade-in-down" x-data="{ filterOpen: false }">
     
     <!-- Header -->
     <div class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -30,7 +30,12 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                 Export
             </button>
-        </div>
+            
+            <a href="{{ route('kasir.laporan.export', ['start_date' => $startDate, 'end_date' => $endDate]) }}" target="_blank" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium shadow-lg hover:shadow-green-500/30 transition-all flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Export Excel
+            </a>
+        </form>
     </div>
 
     <!-- Summary Stats -->
@@ -79,18 +84,17 @@
     </div>
 
     <!-- Transaction Table -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead class="bg-gray-50 border-b">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 border-b border-gray-200">
                     <tr>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm">ID Transaksi</th>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm">Waktu</th>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm">Item</th>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm">Total Belanja</th>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm">Pembayaran</th>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm text-center">Status</th>
-                        <th class="px-6 py-3 font-semibold text-gray-600 text-sm text-right">Aksi</th>
+                        <th class="px-6 py-4 font-bold text-gray-600 text-xs uppercase tracking-wider">No Transaksi</th>
+                        <th class="px-6 py-4 font-bold text-gray-600 text-xs uppercase tracking-wider">Waktu</th>
+                        <th class="px-6 py-4 font-bold text-gray-600 text-xs uppercase tracking-wider">Kasir</th>
+                        <th class="px-6 py-4 font-bold text-gray-600 text-xs uppercase tracking-wider">Detail Item</th>
+                        <th class="px-6 py-4 font-bold text-gray-600 text-xs uppercase tracking-wider text-right">Total</th>
+                        <th class="px-6 py-4 font-bold text-gray-600 text-xs uppercase tracking-wider text-center">Metode</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -135,7 +139,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-10 text-center text-gray-500">
+                        <td colspan="6" class="px-6 py-16 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
                                 <span class="text-4xl mb-3 opacity-20">🧾</span>
                                 <p>Belum ada data transaksi pada tanggal ini.</p>
@@ -151,6 +155,7 @@
         <div class="px-6 py-4 border-t">
             {{ $laporan->links() }}
         </div>
+        @endif
     </div>
 </div>
 @endsection

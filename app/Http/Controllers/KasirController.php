@@ -57,7 +57,7 @@ class KasirController extends Controller
     }
 
     /**
-     * Laporan Penjualan
+     * Laporan Penjualan Real-time
      */
     public function laporan(Request $request)
     {
