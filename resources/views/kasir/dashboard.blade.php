@@ -35,7 +35,7 @@
             </div>
             <div class="text-xs text-green-600 font-medium flex items-center gap-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                <span>Update Realtime</span>
+                <span>Data Real-time</span>
             </div>
         </div>
         
@@ -52,7 +52,7 @@
             </div>
              <div class="text-xs text-green-600 font-medium flex items-center gap-1">
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                <span>Update Realtime</span>
+                <span>Akumulasi Hari Ini</span>
             </div>
         </div>
 
@@ -67,10 +67,10 @@
                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 </div>
             </div>
-             <div class="text-xs text-red-500 font-medium hover:underline cursor-pointer">
+             <a href="{{ route('kasir.stock') }}" class="text-xs text-red-500 font-medium hover:underline cursor-pointer flex items-center gap-1">
                 Lihat detail &rarr;
-            </div>
-        </a>
+            </a>
+        </div>
     </div>
 
     <!-- Recent Transactions Table (Expanded) -->
@@ -95,27 +95,40 @@
                     @forelse($recentTransactions as $trx)
                     <tr class="hover:bg-gray-50 transition-colors group">
                         <td class="px-6 py-4 font-mono text-sm text-indigo-600 font-medium bg-white">
-                            #{{ $trx->no_penjualan }}
+                            #{{ $trx->no_penjualan ?? $trx->id_penjualan }}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-500">{{ $trx->created_at->format('H:i') }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-800 truncate max-w-xs">
-                             @php
-                                $items = $trx->details->map(function($d) {
-                                    return $d->barang->nama_barang . ($d->jumlah > 1 ? " x{$d->jumlah}" : '');
-                                })->join(', ');
+                        <td class="px-6 py-4 text-sm text-gray-500">
+                            {{ $trx->created_at->format('H:i') }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-800">
+                            @php
+                                $items = $trx->details->take(2);
+                                $more = $trx->details->count() - 2;
                             @endphp
-                            {{ \Illuminate\Support\Str::limit($items, 50) }}
+                            @foreach($items as $item)
+                                {{ $item->barang->nama_barang ?? 'Item dihapus' }} (x{{ $item->jumlah }}){{ !$loop->last ? ',' : '' }}
+                            @endforeach
+                            @if($more > 0)
+                                <span class="text-gray-400 text-xs">+{{ $more }} lainnya</span>
+                            @endif
                         </td>
-                        <td class="px-6 py-4 text-sm font-bold text-gray-800">Rp {{ number_format($trx->total, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-gray-800">
+                            Rp {{ number_format($trx->total, 0, ',', '.') }}
+                        </td>
                         <td class="px-6 py-4">
-                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100 uppercase">
-                                {{ $trx->metode_bayar }}
+                            <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-bold border border-green-100">
+                                {{ ucfirst($trx->status) }}
                             </span>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-gray-400">Belum ada transaksi hari ini.</td>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <svg class="w-8 h-8 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                                <p>Belum ada transaksi hari ini</p>
+                            </div>
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

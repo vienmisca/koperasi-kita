@@ -93,13 +93,7 @@
                     <span class="font-medium">Cek Stok</span>
                 </a>
                 
-                <p class="px-2 text-xs font-semibold text-gray-400 uppercase tracking-wider mt-6 mb-3">Pengaturan</p>
 
-                <a href="#"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-gray-600 hover:bg-gray-50 hover:text-gray-900">
-                    <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span class="font-medium">Akun & Setting</span>
-                </a>
             </nav>
 
             <!-- USER INFO -->
@@ -119,19 +113,8 @@
         <div class="flex-1 flex flex-col min-h-screen transition-all duration-300 md:pl-64">
             <!-- TOPBAR -->
             <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-50 shadow-sm backdrop-blur-md bg-white/80">
-                <!-- Search Bar (Hidden on mobile) -->
-                <div class="flex-1 max-w-xl hidden md:block">
-                    <div class="relative group">
-                        <input
-                            type="text"
-                            placeholder="Cari menu, transaksi, atau bantuan..."
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 pl-11 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white transition-all"
-                        />
-                        <div class="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </div>
-                    </div>
-                </div>
+                <!-- Spacer to push items to right -->
+                <div class="flex-1"></div>
 
                 <!-- Right Side Icons -->
                 <div class="flex items-center gap-2 md:gap-4 ml-auto">
@@ -169,18 +152,7 @@
                                 <p class="text-xs text-gray-500 mt-0.5">{{ auth()->user()->email }}</p>
                             </div>
                             
-                            <div class="py-1">
-                                <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                                    Profile
-                                </a>
-                                <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    Settings
-                                </a>
-                            </div>
 
-                            <div class="border-t border-gray-50 my-1"></div>
                             
                             <a href="{{ route('logout') }}" 
                                class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"

@@ -129,19 +129,8 @@
         <div class="flex-1 flex flex-col min-h-screen transition-all duration-300 md:pl-64">
             <!-- TOPBAR -->
             <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm backdrop-blur-md bg-white/80">
-                <!-- Search Bar (Hidden on mobile) -->
-                 <div class="flex-1 max-w-xl hidden md:block">
-                    <div class="relative group">
-                        <input
-                            type="text"
-                            placeholder="Cari fitur admin..."
-                            class="w-full rounded-xl border border-gray-200 bg-gray-50 pl-11 pr-4 py-2 text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white transition-all"
-                        />
-                        <div class="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </div>
-                    </div>
-                </div>
+                <!-- Title/Spacer instead of Search -->
+                <div class="flex-1 hidden md:block"></div>
 
                 <!-- Right Side Icons -->
                 <div class="flex items-center gap-2 md:gap-4 ml-auto">
@@ -211,5 +200,7 @@
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
         @csrf
     </form>
+
+    @stack('scripts')
 </body>
 </html>
