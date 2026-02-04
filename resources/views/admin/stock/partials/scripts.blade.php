@@ -90,7 +90,7 @@
 
             // --- HELPER TO CLOSE ALL MODALS ---
             closeAllModals() {
-                console.log('Closing all modals...');
+                // Remove console log
                 this.showForm = false;
                 this.showEditModal = false;
                 this.showKategoriModal = false;
@@ -99,34 +99,39 @@
 
             // --- MODAL HANDLERS ---
             openKategoriModal() {
-                 console.log("OPEN KATEGORI CLICKED");
-                 this.closeAllModals();
-                 this.$nextTick(() => { this.showKategoriModal = true; });
+                 this.showForm = false;
+                 this.showEditModal = false;
+                 this.showImportModal = false;
+                 this.showKategoriModal = true;
             },
             
             openImportModal() {
-                console.log("OPEN IMPORT CLICKED");
-                this.closeAllModals();
-                this.$nextTick(() => { this.showImportModal = true; });
+                this.showForm = false;
+                this.showEditModal = false;
+                this.showKategoriModal = false;
+                this.showImportModal = true;
             },
             
             openBarangMasukModal() {
-                console.log("OPEN BARANG MASUK CLICKED");
-                this.closeAllModals();
+                this.showEditModal = false;
+                this.showKategoriModal = false;
+                this.showImportModal = false;
+                
                 this.resetForm();
-                this.$nextTick(() => { this.showForm = true; this.mode = 'new'; });
+                this.mode = 'new';
+                this.showForm = true;
             },
 
             openEditModal(id) {
-                console.log("OPEN EDIT CLICKED", id);
-                this.closeAllModals();
+                this.showForm = false;
+                this.showKategoriModal = false;
+                this.showImportModal = false;
                 
                 const barang = this.barangList.find(b => b.id_barang == id);
                 if (!barang) return this.notify('error', 'Data hilang!');
                 
                 this.editItem = { ...this.editItem, ...barang, imagePreview: null, imageFile: null };
-                
-                this.$nextTick(() => { this.showEditModal = true; });
+                this.showEditModal = true;
             },
 
             searchBarang() {
@@ -264,7 +269,10 @@
                 finally { this.isImporting = false; }
             },
 
-            closeModal() { this.showForm = false; setTimeout(() => this.resetForm(), 300); },
+            closeModal() { 
+                this.closeAllModals(); 
+                setTimeout(() => this.resetForm(), 300); 
+            },
             resetForm() {
                 this.mode = 'existing'; this.selectedBarang = null; this.existingItem = { jumlah: 1, harga_beli_baru: '' };
                 this.newItem = { kode_barang: '', nama_barang: '', id_kategori: '', harga_beli: '', harga_jual: '', stok_awal: 0, stok_minimal: 10, satuan: '', deskripsi: '' };

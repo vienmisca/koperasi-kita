@@ -16,7 +16,7 @@
             <!-- Group: Data Management -->
             <div class="flex items-center gap-2">
                 <!-- Manage Category Button -->
-                <button type="button" @click="openKategoriModal()"
+                <button type="button" @click="showKategoriModal = true; showImportModal = false; showForm = false; showEditModal = false;"
                         class="px-4 py-2 text-sm font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-lg shadow-sm transition-all flex items-center gap-2 transform active:scale-95"
                         title="Kelola Kategori">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
@@ -24,7 +24,7 @@
                 </button>
 
                 <!-- Import Button -->
-                <button type="button" @click="openImportModal()"
+                <button type="button" @click="showImportModal = true; showKategoriModal = false; showForm = false; showEditModal = false;"
                         class="px-4 py-2 text-sm font-semibold text-white bg-green-600 hover:bg-green-700 rounded-lg shadow-sm transition-all flex items-center gap-2 transform active:scale-95"
                         title="Import Data Excel">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>

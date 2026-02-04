@@ -1,13 +1,12 @@
 <!-- ================= MODAL IMPORT STOCK (SIMPLIFIED) ================= -->
 <div x-show="showImportModal" 
-     style="display: none;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+     class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
 
     <div x-show="showImportModal"
          x-transition:enter="transition ease-out duration-300"
@@ -17,15 +16,15 @@
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
          class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden"
-         @click.away="closeModal()">
-
+         @click.away="showImportModal = false">
+         
         <!-- Header -->
         <div class="bg-green-600 px-6 py-4 flex justify-between items-center">
             <h3 class="text-white font-bold text-lg flex items-center gap-2">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
                 Import Data Stok
             </h3>
-            <button @click="closeModal()" class="text-green-200 hover:text-white transition-colors">
+            <button @click="showImportModal = false" class="text-green-200 hover:text-white transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -59,7 +58,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" @click="closeModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium">
+                    <button type="button" @click="showImportModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium">
                         Batal
                     </button>
                     <button type="submit" 

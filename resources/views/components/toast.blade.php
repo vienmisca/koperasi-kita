@@ -15,7 +15,7 @@
     }
 }"
 @notify.window="add($event)"
-class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none">
+class="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none">
     
     <template x-for="(note, index) in notifications" :key="note.id">
         <div x-show="note.show"

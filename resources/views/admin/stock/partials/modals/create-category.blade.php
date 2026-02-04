@@ -1,13 +1,12 @@
 <!-- ================= MODAL TAMBAH KATEGORI (SIMPLIFIED) ================= -->
 <div x-show="showKategoriModal" 
-     style="display: none;"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0"
-     class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+     class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
 
     <div x-show="showKategoriModal"
          x-transition:enter="transition ease-out duration-300"
@@ -17,7 +16,7 @@
          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
          x-transition:leave-end="opacity-0 scale-90 translate-y-4"
          class="bg-white rounded-xl shadow-lg w-full max-w-md overflow-hidden"
-         @click.away="closeModal()">
+         @click.away="showKategoriModal = false">
         
         <!-- Header -->
         <div class="bg-purple-600 px-6 py-4 flex justify-between items-center">
@@ -25,7 +24,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                 Kelola Kategori
             </h3>
-            <button @click="closeModal()" class="text-purple-200 hover:text-white transition-colors">
+            <button @click="showKategoriModal = false" class="text-purple-200 hover:text-white transition-colors">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -67,7 +66,7 @@
 
                 <!-- Action Buttons -->
                 <div class="mt-6 flex justify-end gap-3 border-t pt-4">
-                    <button type="button" @click="closeModal()" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
+                    <button type="button" @click="showKategoriModal = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors">
                         Batal
                     </button>
                     <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-md transition-colors">
