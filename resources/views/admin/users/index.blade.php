@@ -12,8 +12,8 @@
             <p class="text-gray-600 mt-2">Atur akun admin dan kasir sistem.</p>
         </div>
         <button @click="openCreateModal()" 
-                class="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition flex items-center gap-2 font-medium">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                class="px-5 py-3 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all flex items-center gap-2 font-bold text-sm transform active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
             Tambah Pengguna
         </button>
     </div>
@@ -102,45 +102,72 @@
             
             <form @submit.prevent="submitForm()" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Nama Lengkap</label>
                     <input type="text" x-model="form.name" required
-                           class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-gray-800 font-medium focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400"
+                           placeholder="Masukkan nama lengkap">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
                     <input type="email" x-model="form.email" required
-                           class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                           class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-gray-800 font-medium focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400"
+                           placeholder="contoh@email.com">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                    <select x-model="form.role" class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
-                        <option value="kasir">Kasir</option>
-                        <option value="admin">Admin</option>
-                    </select>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Role Akses</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Kasir Option -->
+                        <div @click="form.role = 'kasir'" 
+                             class="cursor-pointer rounded-xl p-3 border-2 transition-all flex flex-col items-center justify-center gap-2"
+                             :class="form.role === 'kasir' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'">
+                            <div class="p-2 rounded-full" :class="form.role === 'kasir' ? 'bg-blue-100' : 'bg-gray-100'">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            </div>
+                            <span class="font-bold text-sm">Kasir</span>
+                        </div>
+                        
+                        <!-- Admin Option -->
+                        <div @click="form.role = 'admin'" 
+                             class="cursor-pointer rounded-xl p-3 border-2 transition-all flex flex-col items-center justify-center gap-2"
+                             :class="form.role === 'admin' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-100 bg-white text-gray-500 hover:border-gray-200'">
+                            <div class="p-2 rounded-full" :class="form.role === 'admin' ? 'bg-purple-100' : 'bg-gray-100'">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </div>
+                            <span class="font-bold text-sm">Admin</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1" x-text="isEdit ? 'Password Baru (Opsional)' : 'Password'"></label>
-                    <input type="password" x-model="form.password" :required="!isEdit"
-                           class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="********">
-                    <p x-show="isEdit" class="text-xs text-gray-500 mt-1">Biarkan kosong jika tidak ingin mengganti password.</p>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5" x-text="isEdit ? 'Password Baru (Opsional)' : 'Password'"></label>
+                    <div class="relative">
+                        <input :type="showPassword ? 'text' : 'password'" x-model="form.password" :required="!isEdit"
+                               class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-gray-800 font-medium focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400"
+                               placeholder="********">
+                        <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 px-4 text-gray-400 hover:text-gray-600 focus:outline-none">
+                            <svg x-show="!showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            <svg x-show="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                        </button>
+                    </div>
+                    <p x-show="isEdit" class="text-[10px] text-gray-400 mt-1 font-medium">Biarkan kosong jika tidak ingin mengganti password.</p>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1" x-text="isEdit ? 'Konfirmasi Password Baru' : 'Konfirmasi Password'"></label>
-                    <input type="password" x-model="form.password_confirmation" :required="(!isEdit || form.password)"
-                           class="w-full border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                           placeholder="********">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5" x-text="isEdit ? 'Konfirmasi Password Baru' : 'Konfirmasi Password'"></label>
+                    <div class="relative">
+                        <input :type="showPassword ? 'text' : 'password'" x-model="form.password_confirmation" :required="(!isEdit || form.password)"
+                               class="w-full bg-gray-50 border-none rounded-xl px-4 py-3 text-gray-800 font-medium focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-gray-400"
+                               placeholder="********">
+                    </div>
                 </div>
                 
-                <div class="pt-4 flex justify-end gap-3">
-                    <button type="button" @click="showModal = false" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Batal</button>
+                <div class="pt-6 flex justify-end gap-3">
+                    <button type="button" @click="showModal = false" class="px-5 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition text-sm">Batal</button>
                     <button type="submit" 
-                            class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-md transition transform active:scale-95">
-                        Simpan
+                            class="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition transform active:scale-95 text-sm flex items-center gap-2">
+                        <span x-text="isEdit ? 'Simpan Perubahan' : 'Buat Pengguna'"></span>
                     </button>
                 </div>
             </form>
@@ -152,6 +179,7 @@
     function userManagement() {
         return {
             showModal: false,
+            showPassword: false,
             isEdit: false,
             form: {
                 id: null,
@@ -164,6 +192,7 @@
             
             openCreateModal() {
                 this.isEdit = false;
+                this.showPassword = false;
                 this.form = {
                     id: null,
                     name: '',
@@ -177,6 +206,7 @@
             
             openEditModal(user) {
                 this.isEdit = true;
+                this.showPassword = false;
                 this.form = {
                     id: user.id,
                     name: user.name,

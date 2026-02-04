@@ -14,14 +14,26 @@ class KasirController extends Controller
      */
     public function dashboard()
     {
-        // Simple stats for dashboard
+        // Real-time stats
         $totalBarang = Barang::count();
         $stokRendah = Barang::whereColumn('stok', '<=', 'stok_minimal')->count();
-        // Placeholder for sales data
-        $penjualanHariIni = 0; 
-        $transaksiHariIni = 0;
+        
+        $transaksiHariIni = \App\Models\Penjualan::whereDate('tanggal', now())->count();
+        $penjualanHariIni = \App\Models\Penjualan::whereDate('tanggal', now())->sum('total');
 
-        return view('kasir.dashboard', compact('totalBarang', 'stokRendah', 'penjualanHariIni', 'transaksiHariIni'));
+        // Recent transactions
+        $recentTransactions = \App\Models\Penjualan::with('details.barang')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('kasir.dashboard', compact(
+            'totalBarang', 
+            'stokRendah', 
+            'penjualanHariIni', 
+            'transaksiHariIni',
+            'recentTransactions'
+        ));
     }
 
     /**
@@ -29,7 +41,7 @@ class KasirController extends Controller
      */
     public function transaksi()
     {
-        $products = Barang::where('status', 'aktif')->where('stok', '>', 0)->get();
+        $products = Barang::with('kategori')->where('status', 'aktif')->get();
         return view('kasir.transaksi', compact('products'));
     }
 
@@ -47,12 +59,28 @@ class KasirController extends Controller
     /**
      * Laporan Penjualan
      */
-    public function laporan()
+    public function laporan(Request $request)
     {
-        // Placeholder data for reports
-        // In real app, fetch from Transaksi model
-        $laporan = []; 
+        $date = $request->get('date', now()->format('Y-m-d'));
+
+        // Query dasar
+        $query = \App\Models\Penjualan::with('details.barang')
+            ->whereDate('tanggal', $date);
+
+        // Stats (sebelum pagination)
+        $totalPendapatan = $query->sum('total');
+        $totalTransaksi = $query->count();
+        $rataRata = $totalTransaksi > 0 ? $totalPendapatan / $totalTransaksi : 0;
+
+        // Data Table
+        $laporan = $query->latest()->paginate(10)->withQueryString();
         
-        return view('kasir.laporan', compact('laporan'));
+        return view('kasir.laporan', compact(
+            'laporan', 
+            'totalPendapatan', 
+            'totalTransaksi', 
+            'rataRata',
+            'date'
+        ));
     }
 }
